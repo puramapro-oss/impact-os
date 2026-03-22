@@ -55,8 +55,8 @@ export default function Documents() {
             <button key={folder} onClick={() => toggleFolder(folder)}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '8px 12px', borderRadius: 6, background: selectedFolder === folder ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: selectedFolder === folder ? 'var(--accent-green)' : 'var(--text-secondary)',
+                padding: '8px 12px', borderRadius: 6, background: selectedFolder === folder ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                color: selectedFolder === folder ? '#f59e0b' : 'var(--text-secondary)',
                 fontSize: 13, fontWeight: selectedFolder === folder ? 600 : 400,
                 transition: 'all 0.15s ease', textAlign: 'left',
               }}
@@ -79,16 +79,16 @@ export default function Documents() {
             onDragLeave={() => setDragOver(false)}
             onDrop={(e) => { e.preventDefault(); setDragOver(false); addToast('Fichier importé avec succès', 'success'); }}
             style={{
-              border: `2px dashed ${dragOver ? 'var(--accent-green)' : 'var(--border-color)'}`,
+              border: `2px dashed ${dragOver ? '#f59e0b' : 'var(--border-color)'}`,
               borderRadius: 'var(--border-radius-card)', padding: 24,
               textAlign: 'center', marginBottom: 16, transition: 'all 0.2s ease',
-              background: dragOver ? 'rgba(16, 185, 129, 0.05)' : 'transparent',
+              background: dragOver ? 'rgba(245, 158, 11, 0.05)' : 'transparent',
             }}
           >
-            <Upload size={24} color={dragOver ? 'var(--accent-green)' : 'var(--text-muted)'} style={{ marginBottom: 8 }} />
+            <Upload size={24} color={dragOver ? '#f59e0b' : 'var(--text-muted)'} style={{ marginBottom: 8 }} />
             <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
               Glissez-déposez vos fichiers ici ou{' '}
-              <span style={{ color: 'var(--accent-green)', cursor: 'pointer', fontWeight: 600 }}
+              <span style={{ color: '#f59e0b', cursor: 'pointer', fontWeight: 600 }}
                 onClick={() => addToast('Sélectionnez un fichier', 'info')}>
                 parcourez
               </span>

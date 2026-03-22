@@ -63,7 +63,7 @@ export default function Resoutre() {
     <div style={{ animation: 'fadeIn 0.4s ease', maxWidth: 900, margin: '0 auto' }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 28, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Sparkles size={28} color="var(--accent-green)" />
+          <Sparkles size={28} color="#f59e0b" />
           RESOUTRE
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
@@ -115,10 +115,10 @@ export default function Resoutre() {
                     background: 'var(--bg-card)', color: 'var(--text-primary)',
                     fontSize: 13, textAlign: 'left', transition: 'all 0.15s ease',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-green)'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#f59e0b'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
                 >
-                  <Icon size={16} color="var(--accent-green)" />
+                  <Icon size={16} color="#f59e0b" />
                   {s.text}
                 </button>
               );
@@ -135,7 +135,7 @@ export default function Resoutre() {
             {steps.map((step, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {i < currentStep ? (
-                  <CheckCircle size={18} color="var(--accent-green)" />
+                  <CheckCircle size={18} color="#10b981" />
                 ) : i === currentStep ? (
                   <Loader size={18} color="var(--accent-blue)" style={{ animation: 'spin 1s linear infinite' }} />
                 ) : (
@@ -158,7 +158,7 @@ export default function Resoutre() {
       {result && (
         <div className="glass-card" style={{ padding: 24, marginBottom: 24, animation: 'fadeIn 0.4s ease' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <CheckCircle size={20} color="var(--accent-green)" />
+            <CheckCircle size={20} color="#10b981" />
             <h3 style={{ fontSize: 16 }}>Résultat</h3>
           </div>
           <div style={{
@@ -196,7 +196,7 @@ export default function Resoutre() {
             onClick={() => { setQuery(h.question); }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Sparkles size={14} color="var(--accent-green)" />
+                <Sparkles size={14} color="#f59e0b" />
                 <span style={{ fontSize: 13 }}>{h.question}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

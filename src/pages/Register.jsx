@@ -65,10 +65,11 @@ export default function Register() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 48, height: 48, borderRadius: 12, margin: '0 auto 16px',
-            background: 'var(--accent-green)',
+            background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 20, color: 'white',
-          }}>IO</div>
+            fontSize: 24,
+            boxShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
+          }}>✨</div>
           <h1 style={{ fontSize: 28, marginBottom: 8, fontFamily: 'var(--font-heading)' }}>Créer un compte</h1>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
             14 jours d'essai gratuit — Sans carte bancaire
@@ -95,8 +96,8 @@ export default function Register() {
           <Field label="Confirmer le mot de passe" field="confirmPassword" icon={Lock} placeholder="Confirmez votre mot de passe" />
 
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 20, cursor: 'pointer' }}>
-            <input type="checkbox" defaultChecked style={{ accentColor: 'var(--accent-green)', marginTop: 2 }} />
-            <span>J'accepte les <span style={{ color: 'var(--accent-green)' }}>Conditions Générales d'Utilisation</span> et la <span style={{ color: 'var(--accent-green)' }}>Politique de Confidentialité</span></span>
+            <input type="checkbox" defaultChecked style={{ accentColor: '#f59e0b', marginTop: 2 }} />
+            <span>J'accepte les <span style={{ color: '#f59e0b' }}>Conditions Générales d'Utilisation</span> et la <span style={{ color: '#f59e0b' }}>Politique de Confidentialité</span></span>
           </label>
 
           <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15 }}>
@@ -106,7 +107,7 @@ export default function Register() {
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--text-secondary)' }}>
           Déjà un compte ?{' '}
-          <span onClick={() => navigate('/login')} style={{ color: 'var(--accent-green)', cursor: 'pointer', fontWeight: 600 }}>
+          <span onClick={() => navigate('/login')} style={{ color: '#f59e0b', cursor: 'pointer', fontWeight: 600 }}>
             Se connecter
           </span>
         </p>

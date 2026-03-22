@@ -49,15 +49,15 @@ export default function Inbox() {
           <button key={t.id} onClick={() => { setTab(t.id); setSelected(null); }}
             style={{
               padding: '10px 20px', fontSize: 14, fontWeight: tab === t.id ? 600 : 400,
-              color: tab === t.id ? 'var(--accent-green)' : 'var(--text-secondary)',
+              color: tab === t.id ? '#f59e0b' : 'var(--text-secondary)',
               background: 'transparent',
-              borderBottom: tab === t.id ? '2px solid var(--accent-green)' : '2px solid transparent',
+              borderBottom: tab === t.id ? '2px solid #f59e0b' : '2px solid transparent',
               transition: 'all 0.15s ease',
             }}>
             {t.label}
             <span style={{
               marginLeft: 8, padding: '2px 8px', borderRadius: 10,
-              background: tab === t.id ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-card)',
+              background: tab === t.id ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-card)',
               fontSize: 11, fontWeight: 600,
             }}>{t.count}</span>
           </button>
@@ -130,7 +130,7 @@ export default function Inbox() {
                 {selected.actions.map((action, i) => (
                   <button key={i} onClick={() => handleAction(selected.id, action.toLowerCase())}
                     className="btn-secondary" style={{ justifyContent: 'flex-start', fontSize: 13 }}>
-                    <CheckCircle size={14} color="var(--accent-green)" />
+                    <CheckCircle size={14} color="#10b981" />
                     {action}
                   </button>
                 ))}

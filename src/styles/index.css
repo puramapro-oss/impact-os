@@ -1,18 +1,19 @@
 :root {
-  --bg-primary: #0d1117;
-  --bg-card: #161b22;
-  --bg-card-hover: #1c2129;
-  --bg-input: #0d1117;
-  --accent-green: #10b981;
-  --accent-green-glow: rgba(16, 185, 129, 0.4);
-  --accent-blue: #2563eb;
-  --accent-gold: #f59e0b;
+  --bg-primary: #050508;
+  --bg-card: #0f1115;
+  --bg-card-hover: #161a1f;
+  --bg-input: #0a0b0f;
+  --accent-green: #f59e0b;
+  --accent-green-glow: rgba(245, 158, 11, 0.4);
+  --accent-blue: #3b82f6;
+  --accent-gold: #fbbf24;
   --accent-red: #ef4444;
   --accent-purple: #8b5cf6;
+  --accent-success: #10b981;
   --text-primary: #f0f6fc;
   --text-secondary: #8b949e;
   --text-muted: #484f58;
-  --border-color: #30363d;
+  --border-color: #1e2228;
   --border-radius-card: 12px;
   --border-radius-btn: 8px;
   --sidebar-width: 240px;
@@ -85,7 +86,7 @@ img {
 }
 
 .glass-card {
-  background: rgba(22, 27, 34, 0.8);
+  background: rgba(15, 17, 21, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
@@ -98,7 +99,7 @@ img {
 
 .btn-primary {
   background: var(--accent-green);
-  color: white;
+  color: #050508;
   padding: 10px 24px;
   border-radius: var(--border-radius-btn);
   font-weight: 600;
@@ -111,7 +112,7 @@ img {
 }
 
 .btn-primary:hover {
-  background: #059669;
+  background: #d97706;
   transform: translateY(-1px);
   box-shadow: 0 0 30px var(--accent-green-glow);
 }
@@ -161,17 +162,17 @@ img {
 
 .badge-green {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-green);
+  color: #10b981;
 }
 
 .badge-blue {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(59, 130, 246, 0.15);
   color: var(--accent-blue);
 }
 
 .badge-gold {
   background: rgba(245, 158, 11, 0.15);
-  color: var(--accent-gold);
+  color: var(--accent-green);
 }
 
 .badge-red {

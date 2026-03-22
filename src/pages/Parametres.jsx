@@ -35,7 +35,7 @@ export default function Parametres() {
   ];
 
   const modesIA = [
-    { id: 'SAFE', label: 'SAFE', desc: 'L\'IA propose, vous validez chaque action', color: '#10b981' },
+    { id: 'SAFE', label: 'SAFE', desc: 'L\'IA propose, vous validez chaque action', color: '#f59e0b' },
     { id: 'AUTOPILOT', label: 'AUTOPILOT', desc: 'L\'IA exécute les tâches à faible risque automatiquement', color: '#f59e0b' },
     { id: 'FULL', label: 'FULL', desc: 'L\'IA exécute toutes les tâches en autonomie complète', color: '#ef4444' },
   ];
@@ -73,8 +73,8 @@ export default function Parametres() {
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
                 borderRadius: 'var(--border-radius-btn)', fontSize: 13,
-                background: tab === t.id ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: tab === t.id ? 'var(--accent-green)' : t.id === 'danger' ? 'var(--accent-red)' : 'var(--text-secondary)',
+                background: tab === t.id ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                color: tab === t.id ? '#f59e0b' : t.id === 'danger' ? 'var(--accent-red)' : 'var(--text-secondary)',
                 fontWeight: tab === t.id ? 600 : 400, textAlign: 'left',
               }}>
                 <Icon size={16} /> {t.label}
@@ -244,21 +244,21 @@ export default function Parametres() {
           {tab === 'facturation' && (
             <div>
               <h3 style={{ fontSize: 18, marginBottom: 20 }}>Facturation</h3>
-              <div className="glass-card" style={{ padding: 16, marginBottom: 16, background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              <div className="glass-card" style={{ padding: 16, marginBottom: 16, background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 700 }}>Plan Pro</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Facturé mensuellement</div>
+                    <div style={{ fontSize: 16, fontWeight: 700 }}>Plan Flamme 🔥</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Facturé mensuellement — 1 000 actions IA/mois</div>
                   </div>
-                  <div style={{ fontSize: 28, fontWeight: 800, fontFamily: 'var(--font-heading)', color: 'var(--accent-green)' }}>59€<span style={{ fontSize: 14, fontWeight: 400 }}>/mois</span></div>
+                  <div style={{ fontSize: 28, fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#f59e0b' }}>33€<span style={{ fontSize: 14, fontWeight: 400 }}>/mois</span></div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
-                  { date: '01/03/2026', montant: '59,00€', statut: 'Payée' },
-                  { date: '01/02/2026', montant: '59,00€', statut: 'Payée' },
-                  { date: '01/01/2026', montant: '59,00€', statut: 'Payée' },
-                  { date: '01/12/2025', montant: '59,00€', statut: 'Payée' },
+                  { date: '01/03/2026', montant: '33,00€', statut: 'Payée' },
+                  { date: '01/02/2026', montant: '33,00€', statut: 'Payée' },
+                  { date: '01/01/2026', montant: '33,00€', statut: 'Payée' },
+                  { date: '01/12/2025', montant: '33,00€', statut: 'Payée' },
                 ].map((f, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 6, border: '1px solid var(--border-color)' }}>
                     <span style={{ fontSize: 13 }}>{f.date}</span>

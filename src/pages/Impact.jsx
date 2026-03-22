@@ -10,7 +10,7 @@ import {
 import { indicateursImpact, subventions, chartData6Months } from '../data/mockData';
 import { useToast } from '../contexts/ToastContext';
 
-const COLORS = ['#10b981', '#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
+const COLORS = ['#f59e0b', '#3b82f6', '#fbbf24', '#8b5cf6', '#ef4444', '#ec4899'];
 
 const rapports = [
   { id: 1, nom: 'Rapport d\'impact Q1 2026', date: 'Mars 2026', pages: 24, statut: 'Finalisé' },
@@ -72,9 +72,9 @@ export default function Impact() {
           return (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               padding: '10px 20px', fontSize: 14, fontWeight: tab === t.id ? 600 : 400,
-              color: tab === t.id ? 'var(--accent-green)' : 'var(--text-secondary)',
+              color: tab === t.id ? '#f59e0b' : 'var(--text-secondary)',
               background: 'transparent', display: 'flex', alignItems: 'center', gap: 6,
-              borderBottom: tab === t.id ? '2px solid var(--accent-green)' : '2px solid transparent',
+              borderBottom: tab === t.id ? '2px solid #f59e0b' : '2px solid transparent',
             }}>
               <Icon size={16} /> {t.label}
             </button>
@@ -123,7 +123,7 @@ export default function Impact() {
                   <XAxis dataKey="mois" stroke="var(--text-secondary)" fontSize={12} />
                   <YAxis stroke="var(--text-secondary)" fontSize={12} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="impact" stroke="#10b981" strokeWidth={3} dot={{ r: 5 }} name="Score impact" />
+                  <Line type="monotone" dataKey="impact" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5 }} name="Score impact" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -165,7 +165,7 @@ export default function Impact() {
               <div style={{ background: 'var(--bg-primary)', borderRadius: 4, height: 6, overflow: 'hidden' }}>
                 <div style={{
                   width: `${sub.progression}%`, height: '100%', borderRadius: 4,
-                  background: sub.statut === 'Accordée' ? '#10b981' : sub.statut === 'Soumis' ? '#2563eb' : '#f59e0b',
+                  background: sub.statut === 'Accordée' ? '#10b981' : sub.statut === 'Soumis' ? '#3b82f6' : '#f59e0b',
                   transition: 'width 1s ease',
                 }} />
               </div>
@@ -183,10 +183,10 @@ export default function Impact() {
           {rapports.map(r => (
             <div key={r.id} className="glass-card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{
-                width: 44, height: 44, borderRadius: 10, background: 'rgba(16, 185, 129, 0.1)',
+                width: 44, height: 44, borderRadius: 10, background: 'rgba(245, 158, 11, 0.1)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <FileText size={20} color="var(--accent-green)" />
+                <FileText size={20} color="#f59e0b" />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{r.nom}</div>

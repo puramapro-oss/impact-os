@@ -47,7 +47,7 @@ export default function Profil() {
       <div className="glass-card" style={{ padding: 24, marginBottom: 24, display: 'flex', gap: 24 }}>
         <div style={{
           width: 96, height: 96, borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--accent-green), var(--accent-blue))',
+          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 32, fontWeight: 800, color: 'white', flexShrink: 0,
         }}>
@@ -55,7 +55,7 @@ export default function Profil() {
         </div>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontSize: 24, marginBottom: 4 }}>{currentUser.name}</h2>
-          <p style={{ fontSize: 14, color: 'var(--accent-green)', fontWeight: 600, marginBottom: 4 }}>{currentUser.role}</p>
+          <p style={{ fontSize: 14, color: '#f59e0b', fontWeight: 600, marginBottom: 4 }}>{currentUser.role}</p>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8 }}>{currentUser.organisation}</p>
           <div style={{ display: 'flex', gap: 16 }}>
             <span style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -69,7 +69,7 @@ export default function Profil() {
             </span>
           </div>
         </div>
-        <span className="badge badge-green">Plan {currentUser.plan}</span>
+        <span className="badge badge-gold">Plan {currentUser.plan} 🔥</span>
       </div>
 
       {/* Stats */}
@@ -78,7 +78,7 @@ export default function Profil() {
           const Icon = s.icon;
           return (
             <div key={i} className="glass-card" style={{ padding: 16, textAlign: 'center' }}>
-              <Icon size={20} color="var(--accent-green)" style={{ marginBottom: 8 }} />
+              <Icon size={20} color="#f59e0b" style={{ marginBottom: 8 }} />
               <div style={{ fontSize: 24, fontWeight: 800, fontFamily: 'var(--font-heading)' }}>{s.value}</div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{s.label}</div>
             </div>

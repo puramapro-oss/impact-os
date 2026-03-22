@@ -37,7 +37,7 @@ export default function Agent() {
     <div style={{ animation: 'fadeIn 0.4s ease' }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 28, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Bot size={28} color="var(--accent-green)" />
+          <Bot size={28} color="#f59e0b" />
           Agent Exécutif
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
@@ -51,9 +51,9 @@ export default function Agent() {
           return (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               padding: '10px 20px', fontSize: 14, fontWeight: tab === t.id ? 600 : 400,
-              color: tab === t.id ? 'var(--accent-green)' : 'var(--text-secondary)',
+              color: tab === t.id ? '#f59e0b' : 'var(--text-secondary)',
               background: 'transparent', display: 'flex', alignItems: 'center', gap: 6,
-              borderBottom: tab === t.id ? '2px solid var(--accent-green)' : '2px solid transparent',
+              borderBottom: tab === t.id ? '2px solid #f59e0b' : '2px solid transparent',
             }}>
               <Icon size={16} />
               {t.label}
@@ -138,7 +138,7 @@ export default function Agent() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           {modeles.map(m => (
             <div key={m.id} className="glass-card" style={{ padding: 16, cursor: 'pointer', transition: 'all 0.15s ease' }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-green)'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#f59e0b'}
               onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
               onClick={() => addToast(`Modèle "${m.nom}" chargé`, 'success')}
             >
@@ -161,11 +161,11 @@ export default function Agent() {
               <div key={c.id} className="glass-card" style={{ padding: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Icon size={22} color={c.statut === 'connecte' ? 'var(--accent-green)' : 'var(--text-muted)'} />
+                    <Icon size={22} color={c.statut === 'connecte' ? '#10b981' : 'var(--text-muted)'} />
                     <span style={{ fontSize: 15, fontWeight: 600 }}>{c.nom}</span>
                   </div>
                   {c.statut === 'connecte'
-                    ? <CheckCircle size={18} color="var(--accent-green)" />
+                    ? <CheckCircle size={18} color="#10b981" />
                     : <XCircle size={18} color="var(--text-muted)" />
                   }
                 </div>

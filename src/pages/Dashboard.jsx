@@ -12,7 +12,7 @@ import { getGreeting, formatRelativeTime } from '../hooks/useRelativeTime';
 import { useToast } from '../contexts/ToastContext';
 
 const iconMap = { Zap, Clock, Euro, TrendingUp, FileText, Mail };
-const colorMap = { blue: '#2563eb', green: '#10b981', gold: '#f59e0b', purple: '#8b5cf6' };
+const colorMap = { blue: '#3b82f6', green: '#10b981', gold: '#f59e0b', purple: '#8b5cf6' };
 
 function KPICard({ kpi, index }) {
   const [count, setCount] = useState(0);
@@ -46,10 +46,10 @@ function KPICard({ kpi, index }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
         <div style={{
           width: 40, height: 40, borderRadius: 10,
-          background: 'rgba(16, 185, 129, 0.1)',
+          background: 'rgba(245, 158, 11, 0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Icon size={20} color="var(--accent-green)" />
+          <Icon size={20} color="#f59e0b" />
         </div>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 4,
@@ -131,7 +131,7 @@ export default function Dashboard() {
               <YAxis stroke="var(--text-secondary)" fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
               <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="taches" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Tâches" />
+              <Line type="monotone" dataKey="taches" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Tâches" />
               <Line type="monotone" dataKey="emails" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} name="Emails" />
               <Line type="monotone" dataKey="docs" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Documents" />
             </LineChart>
@@ -147,7 +147,7 @@ export default function Dashboard() {
               <YAxis stroke="var(--text-secondary)" fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
               <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="financements" fill="#10b981" radius={[4, 4, 0, 0]} name="Financements (€)" />
+              <Bar dataKey="financements" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Financements (€)" />
               <Bar dataKey="depenses" fill="#2563eb" radius={[4, 4, 0, 0]} name="Dépenses (€)" />
             </BarChart>
           </ResponsiveContainer>
@@ -219,7 +219,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 {a.statut === 'done' ? (
-                  <CheckCircle size={18} color="var(--accent-green)" />
+                  <CheckCircle size={18} color="#10b981" />
                 ) : (
                   <button onClick={() => handleExecute(a.id)} className="btn-primary" style={{ padding: '6px 12px', fontSize: 12 }}>
                     <Play size={12} /> Exécuter

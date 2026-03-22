@@ -15,7 +15,7 @@ export default function Membres() {
   );
 
   const getInitials = (m) => `${m.prenom[0]}${m.nom[0]}`;
-  const colors = ['#10b981', '#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
+  const colors = ['#f59e0b', '#3b82f6', '#fbbf24', '#8b5cf6', '#ef4444', '#ec4899'];
   const getColor = (id) => colors[id % colors.length];
 
   return (
@@ -45,11 +45,11 @@ export default function Membres() {
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           <button onClick={() => setView('grid')} className="btn-ghost"
-            style={{ padding: 8, color: view === 'grid' ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
+            style={{ padding: 8, color: view === 'grid' ? '#f59e0b' : 'var(--text-secondary)' }}>
             <Grid3X3 size={18} />
           </button>
           <button onClick={() => setView('list')} className="btn-ghost"
-            style={{ padding: 8, color: view === 'list' ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
+            style={{ padding: 8, color: view === 'list' ? '#f59e0b' : 'var(--text-secondary)' }}>
             <List size={18} />
           </button>
         </div>

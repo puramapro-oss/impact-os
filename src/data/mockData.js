@@ -1,3 +1,18 @@
+export const PLANS = {
+  lumiere:   { actions: 5,    resoutre: 2,   documents: 1,   price: 0,  model: 'claude-haiku-4-5' },
+  etincelle: { actions: 300,  resoutre: 25,  documents: 25,  price: 22, model: 'claude-haiku-4-5' },
+  flamme:    { actions: 1000, resoutre: 80,  documents: 999, price: 33, model: 'claude-sonnet-4-5' },
+  soleil:    { actions: 99999,resoutre: 9999,documents: 9999,price: 55, model: 'claude-sonnet-4-5' }
+};
+
+export const ACTION_COSTS = {
+  resoutre: 2,
+  document: 1,
+  email: 0.5,
+  automation: 0.5,
+  search: 1,
+};
+
 export const currentUser = {
   name: 'Sophie Martin',
   role: 'Présidente',
@@ -8,8 +23,10 @@ export const currentUser = {
   membres: 234,
   benevoles: 89,
   budget: 127400,
-  plan: 'Pro',
+  plan: 'Flamme',
   modeIA: 'SAFE',
+  actionsUsed: 347,
+  actionsLimit: 1000,
 };
 
 export const kpis = [
@@ -66,7 +83,7 @@ export const emails = [
   { id: 4, expediteur: 'Jean-Pierre Garnier', email: 'jpgarnier@region-aura.fr', objet: 'Notification de subvention — Dossier accepté', resume: 'Votre dossier de demande de subvention régionale a été accepté. Montant accordé : 4 200€. Versement sous 6 semaines.', date: Date.now() - 8 * 3600 * 1000, lu: true, priorite: 'haute', actions: ['Enregistrer le versement', 'Remercier'], categorie: 'traiter' },
   { id: 5, expediteur: 'Nadia Belkacem', email: 'nadia.b@gmail.com', objet: 'Inscription compétition inter-clubs', resume: 'Demande d\'inscription de 3 équipes pour la compétition inter-clubs du 12 avril. Besoin de confirmation avant le 28 mars.', date: Date.now() - 12 * 3600 * 1000, lu: false, priorite: 'moyenne', actions: ['Valider les équipes', 'Répondre'], categorie: 'traiter' },
   { id: 6, expediteur: 'Antoine Lefevre', email: 'a.lefevre@assurance-sport.fr', objet: 'Renouvellement contrat assurance 2026', resume: 'Le contrat d\'assurance arrive à échéance le 15 avril. Nouvelle proposition avec couverture étendue à 2 890€/an.', date: Date.now() - 24 * 3600 * 1000, lu: true, priorite: 'moyenne', actions: ['Comparer les offres', 'Renouveler'], categorie: 'traiter' },
-  { id: 7, expediteur: 'Sophie Martin', email: 'auto@impact-os.fr', objet: 'Rapport hebdomadaire généré automatiquement', resume: 'Votre rapport de la semaine du 16 au 22 mars est disponible. 47 tâches automatisées, 28h économisées.', date: Date.now() - 2 * 24 * 3600 * 1000, lu: true, priorite: 'basse', actions: ['Consulter le rapport'], categorie: 'traites' },
+  { id: 7, expediteur: 'Sophie Martin', email: 'auto@lumios.fr', objet: 'Rapport hebdomadaire généré automatiquement', resume: 'Votre rapport de la semaine du 16 au 22 mars est disponible. 47 tâches automatisées, 28h économisées.', date: Date.now() - 2 * 24 * 3600 * 1000, lu: true, priorite: 'basse', actions: ['Consulter le rapport'], categorie: 'traites' },
   { id: 8, expediteur: 'Hugo Bernard', email: 'hugo.bernard@sportif-lyon.fr', objet: 'Partenariat événement sportif juin 2026', resume: 'Proposition de partenariat pour l\'événement sportif du 20 juin. Visibilité médiatique et stand gratuit pour l\'association.', date: Date.now() - 3 * 24 * 3600 * 1000, lu: true, priorite: 'basse', actions: ['Étudier la proposition'], categorie: 'traites' },
 ];
 
@@ -163,21 +180,21 @@ export const documentsArborescence = {
 };
 
 export const journalAudit = [
-  { id: 1, timestamp: Date.now() - 5 * 60 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Email traité automatiquement', details: 'Email de la CAF Rhône classé en priorité haute, résumé généré', type: 'ia', niveau: 'info' },
+  { id: 1, timestamp: Date.now() - 5 * 60 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Email traité automatiquement', details: 'Email de la CAF Rhône classé en priorité haute, résumé généré', type: 'ia', niveau: 'info' },
   { id: 2, timestamp: Date.now() - 18 * 60 * 1000, utilisateur: 'Sophie Martin', action: 'Document téléchargé', details: 'Rapport impact Q1 2026.pdf téléchargé depuis Documents', type: 'utilisateur', niveau: 'info' },
-  { id: 3, timestamp: Date.now() - 35 * 60 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Workflow exécuté', details: 'Workflow "Relance cotisations" : 12 emails de relance envoyés', type: 'ia', niveau: 'info' },
+  { id: 3, timestamp: Date.now() - 35 * 60 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Workflow exécuté', details: 'Workflow "Relance cotisations" : 12 emails de relance envoyés', type: 'ia', niveau: 'info' },
   { id: 4, timestamp: Date.now() - 1 * 3600 * 1000, utilisateur: 'Emma Petit', action: 'Membre ajouté', details: 'Nouveau membre Lucas Durand ajouté via HelloAsso', type: 'utilisateur', niveau: 'info' },
-  { id: 5, timestamp: Date.now() - 2 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Subvention soumise', details: 'Dossier CNDS 2026 soumis automatiquement via la plateforme', type: 'ia', niveau: 'success' },
+  { id: 5, timestamp: Date.now() - 2 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Subvention soumise', details: 'Dossier CNDS 2026 soumis automatiquement via la plateforme', type: 'ia', niveau: 'success' },
   { id: 6, timestamp: Date.now() - 3 * 3600 * 1000, utilisateur: 'Sophie Martin', action: 'Paramètres modifiés', details: 'Mode IA changé de SAFE à AUTOPILOT temporairement', type: 'utilisateur', niveau: 'warning' },
-  { id: 7, timestamp: Date.now() - 4 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Anomalie détectée', details: 'Tentative de connexion depuis une IP inconnue bloquée', type: 'ia', niveau: 'error' },
+  { id: 7, timestamp: Date.now() - 4 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Anomalie détectée', details: 'Tentative de connexion depuis une IP inconnue bloquée', type: 'ia', niveau: 'error' },
   { id: 8, timestamp: Date.now() - 6 * 3600 * 1000, utilisateur: 'Hugo Bernard', action: 'Export comptable', details: 'Export du grand livre au format CSV pour l\'expert-comptable', type: 'utilisateur', niveau: 'info' },
-  { id: 9, timestamp: Date.now() - 8 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Rapport généré', details: 'Rapport hebdomadaire semaine 12 généré et envoyé par email', type: 'ia', niveau: 'success' },
+  { id: 9, timestamp: Date.now() - 8 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Rapport généré', details: 'Rapport hebdomadaire semaine 12 généré et envoyé par email', type: 'ia', niveau: 'success' },
   { id: 10, timestamp: Date.now() - 12 * 3600 * 1000, utilisateur: 'Sophie Martin', action: 'Connexion', details: 'Connexion depuis Lyon, France — Chrome 122 / macOS', type: 'utilisateur', niveau: 'info' },
-  { id: 11, timestamp: Date.now() - 18 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Backup effectué', details: 'Sauvegarde complète des documents sur Google Drive réussie', type: 'ia', niveau: 'success' },
+  { id: 11, timestamp: Date.now() - 18 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Backup effectué', details: 'Sauvegarde complète des documents sur Google Drive réussie', type: 'ia', niveau: 'success' },
   { id: 12, timestamp: Date.now() - 24 * 3600 * 1000, utilisateur: 'Jade Michel', action: 'Document modifié', details: 'Règlement intérieur mis à jour — article 7 modifié', type: 'utilisateur', niveau: 'info' },
-  { id: 13, timestamp: Date.now() - 30 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Veille subventions', details: '3 nouveaux appels à projets détectés correspondant au profil', type: 'ia', niveau: 'info' },
+  { id: 13, timestamp: Date.now() - 30 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Veille subventions', details: '3 nouveaux appels à projets détectés correspondant au profil', type: 'ia', niveau: 'info' },
   { id: 14, timestamp: Date.now() - 36 * 3600 * 1000, utilisateur: 'Sophie Martin', action: 'Facture créée', details: 'Facture #2026-047 créée pour la location de matériel', type: 'utilisateur', niveau: 'info' },
-  { id: 15, timestamp: Date.now() - 48 * 3600 * 1000, utilisateur: 'IMPACT OS (IA)', action: 'Conformité vérifiée', details: 'Audit RGPD automatique : toutes les données conformes', type: 'ia', niveau: 'success' },
+  { id: 15, timestamp: Date.now() - 48 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Conformité vérifiée', details: 'Audit RGPD automatique : toutes les données conformes', type: 'ia', niveau: 'success' },
 ];
 
 export const historiqueResoutre = [

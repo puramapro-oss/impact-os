@@ -57,25 +57,28 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         display: 'flex',
         alignItems: 'center',
         padding: collapsed ? '0 16px' : '0 20px',
-        gap: 12,
+        gap: 10,
         borderBottom: '1px solid var(--border-color)',
         flexShrink: 0,
       }}>
         <div style={{
           width: 32, height: 32, borderRadius: 8,
-          background: 'var(--accent-green)',
+          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 14,
-          color: 'white', flexShrink: 0,
+          fontSize: 18, flexShrink: 0,
+          boxShadow: '0 0 12px rgba(245, 158, 11, 0.3)',
         }}>
-          IO
+          ✨
         </div>
         {!collapsed && (
           <span style={{
-            fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 18,
+            fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: 18,
             color: 'var(--text-primary)', whiteSpace: 'nowrap',
+            background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
           }}>
-            IMPACT OS
+            LUMIOS
           </span>
         )}
       </div>
@@ -107,8 +110,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                     padding: collapsed ? '10px 0' : '10px 12px',
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     borderRadius: 'var(--border-radius-btn)',
-                    color: isActive ? 'var(--accent-green)' : 'var(--text-secondary)',
-                    background: isActive ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                    color: isActive ? '#f59e0b' : 'var(--text-secondary)',
+                    background: isActive ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
                     fontSize: 14,
                     fontWeight: isActive ? 600 : 400,
                     transition: 'all 0.15s ease',

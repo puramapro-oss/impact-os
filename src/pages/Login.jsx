@@ -26,13 +26,14 @@ export default function Login() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 48, height: 48, borderRadius: 12, margin: '0 auto 16px',
-            background: 'var(--accent-green)',
+            background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 20, color: 'white',
-          }}>IO</div>
+            fontSize: 24,
+            boxShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
+          }}>✨</div>
           <h1 style={{ fontSize: 28, marginBottom: 8, fontFamily: 'var(--font-heading)' }}>Connexion</h1>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
-            Accédez à votre espace IMPACT OS
+            Accédez à votre espace LUMIOS
           </p>
         </div>
 
@@ -83,7 +84,7 @@ export default function Login() {
               <input type="checkbox" defaultChecked style={{ accentColor: 'var(--accent-green)' }} />
               Se souvenir de moi
             </label>
-            <span style={{ fontSize: 13, color: 'var(--accent-green)', cursor: 'pointer' }}>Mot de passe oublié ?</span>
+            <span style={{ fontSize: 13, color: '#f59e0b', cursor: 'pointer' }}>Mot de passe oublié ?</span>
           </div>
 
           <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15 }}>
@@ -93,7 +94,7 @@ export default function Login() {
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--text-secondary)' }}>
           Pas encore de compte ?{' '}
-          <span onClick={() => navigate('/register')} style={{ color: 'var(--accent-green)', cursor: 'pointer', fontWeight: 600 }}>
+          <span onClick={() => navigate('/register')} style={{ color: '#f59e0b', cursor: 'pointer', fontWeight: 600 }}>
             Créer un compte
           </span>
         </p>
