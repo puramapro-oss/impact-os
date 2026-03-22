@@ -2,27 +2,32 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /* ═══════════════════════════════════════════════════
-   FLUX — Landing page · Partie 1 : Nav + Hero + Ticker
-   Design : Nuit profonde × Cyan eau × Violet énergie
+   MANA — Landing page
+   Design : Nuit océan × Turquoise polynésien × Or sacré × Vert émeraude
 ═══════════════════════════════════════════════════ */
 const HEADING = "'Cormorant Garamond', serif";
 const BODY = "'DM Sans', sans-serif";
 const MONO = "'Courier New', monospace";
 
 const C = {
-  bg: '#050810',
-  bgCard: '#0a1020',
-  cyan: '#6EE7F7',
-  cyanDim: 'rgba(110,231,247,0.08)',
-  cyanGlow: 'rgba(110,231,247,0.25)',
-  violet: '#818CF8',
-  violetDim: 'rgba(129,140,248,0.08)',
-  violetGlow: 'rgba(129,140,248,0.25)',
+  bg: '#040B14',
+  bgCard: '#081420',
+  cyan: '#22D3EE',
+  cyanDim: 'rgba(34,211,238,0.08)',
+  cyanGlow: 'rgba(34,211,238,0.25)',
+  gold: '#F59E0B',
+  goldDim: 'rgba(245,158,11,0.08)',
+  goldGlow: 'rgba(245,158,11,0.25)',
+  emerald: '#10B981',
+  emeraldDim: 'rgba(16,185,129,0.08)',
+  violet: '#F59E0B',
+  violetDim: 'rgba(245,158,11,0.08)',
+  violetGlow: 'rgba(245,158,11,0.25)',
   text: '#f0f6fc',
   muted: 'rgba(240,246,252,0.5)',
   faint: 'rgba(240,246,252,0.25)',
-  border: 'rgba(110,231,247,0.1)',
-  borderHot: 'rgba(110,231,247,0.25)',
+  border: 'rgba(34,211,238,0.1)',
+  borderHot: 'rgba(34,211,238,0.25)',
 };
 
 function useVisible(ref) {
@@ -397,7 +402,7 @@ export default function Landing() {
             fontFamily: HEADING, fontWeight: 700, fontSize: 24, letterSpacing: '-0.02em',
             background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>FLUX</span>
+          }}>MANA</span>
         </div>
         <div style={{ display: 'flex', gap: 32, fontSize: 14, color: C.muted }}>
           {['Comment ça marche', 'Témoignages', 'Prix'].map(l => (
@@ -415,7 +420,7 @@ export default function Landing() {
             color: C.bg, border: 'none', borderRadius: 10, padding: '8px 22px',
             fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: BODY,
             boxShadow: `0 4px 20px ${C.cyanGlow}`,
-          }}>Libère ton flux</button>
+          }}>Reprends ton MANA</button>
         </div>
       </nav>
 
@@ -440,7 +445,7 @@ export default function Landing() {
               borderRadius: 100, padding: '6px 16px', marginBottom: 28,
               fontSize: 12, color: C.cyan, fontFamily: MONO, letterSpacing: 1,
             }}>
-              ✦ 94 000 Français optimisent déjà avec FLUX
+              ✦ 94 000 Français reprennent leur MANA
             </div>
             <h1 style={{
               ...fadeUp(mounted, '0.1s'),
@@ -448,20 +453,35 @@ export default function Landing() {
               fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.03em',
               color: C.text, marginBottom: 24,
             }}>
-              Libère ton{' '}
+              Reprends ton{' '}
               <em style={{
                 fontStyle: 'italic',
-                background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
+                background: `linear-gradient(135deg, ${C.cyan}, ${C.gold})`,
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              }}>flux</em>
-              <br />financier.
+              }}>MANA.</em>
             </h1>
             <p style={{
+              ...fadeUp(mounted, '0.15s'),
+              fontSize: 20, color: C.text, lineHeight: 1.6,
+              marginBottom: 12, maxWidth: 460, fontFamily: HEADING, fontWeight: 500, fontStyle: 'italic',
+            }}>
+              L'énergie de ton argent t'appartient.
+            </p>
+            <p style={{
               ...fadeUp(mounted, '0.2s'),
-              fontSize: 18, color: C.muted, lineHeight: 1.8,
+              fontSize: 14, color: C.muted, lineHeight: 1.8,
+              marginBottom: 16, maxWidth: 440, fontFamily: BODY,
+              background: C.cyanDim, border: `1px solid ${C.border}`,
+              borderRadius: 12, padding: '14px 18px',
+            }}>
+              Dans la culture polynésienne, le <strong style={{ color: C.cyan }}>MANA</strong> est la force sacrée qui circule en toute chose. Le tien s'échappe chaque mois en abonnements oubliés. On t'aide à le reprendre.
+            </p>
+            <p style={{
+              ...fadeUp(mounted, '0.25s'),
+              fontSize: 16, color: C.muted, lineHeight: 1.7,
               marginBottom: 36, maxWidth: 460, fontFamily: BODY,
             }}>
-              FLUX analyse tous tes abonnements et trouve automatiquement les offres moins chères.{' '}
+              MANA analyse tous tes abonnements et trouve automatiquement les offres moins chères.{' '}
               <strong style={{ color: C.text }}>Gratuit. 3 minutes. Résultat garanti.</strong>
             </p>
             <div style={fadeUp(mounted, '0.3s')}>
@@ -473,7 +493,7 @@ export default function Landing() {
                 boxShadow: `0 8px 32px ${C.cyanGlow}`,
                 display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16,
               }}>
-                🌊 Voir mes économies — Gratuit
+                🌊 Récupérer mon MANA — Gratuit
               </button>
               <div style={{ fontSize: 12, color: C.faint, fontFamily: MONO }}>
                 Aucune CB · Résultat en 3 min · 100% RGPD
@@ -571,7 +591,7 @@ export default function Landing() {
               marginRight: 60, fontSize: 13,
               color: `${C.text}50`, fontFamily: MONO, letterSpacing: 1,
             }}>
-              🌊 487€ gaspillés/mois en moyenne &nbsp;·&nbsp;
+              🌊 487€ de MANA perdu/mois en moyenne &nbsp;·&nbsp;
               🎯 156€ récupérés par nos membres &nbsp;·&nbsp;
               ✓ Gratuit, sans CB, sans engagement &nbsp;·&nbsp;
               🇫🇷 Données hébergées en France &nbsp;·&nbsp;
@@ -632,7 +652,7 @@ export default function Landing() {
             }} />
             {[
               { icon: '🔍', title: 'Tu réponds à 4 questions', desc: 'En moins de 3 minutes. Sur tes abonnements actuels.' },
-              { icon: '🤖', title: 'FLUX analyse tout', desc: 'Notre IA compare 200+ offres pour trouver les moins chères.' },
+              { icon: '🤖', title: 'MANA analyse tout', desc: 'Notre IA compare 200+ offres pour trouver les moins chères.' },
               { icon: '💰', title: 'Tu économises', desc: "On s'occupe de tout : résiliations, négociations, switches." },
             ].map((s, i) => (
               <div key={i} style={{ ...fadeUp(v2, `${i * 0.15}s`), textAlign: 'center', position: 'relative', zIndex: 1 }}>
@@ -676,7 +696,7 @@ export default function Landing() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
             {[
-              { name: 'Sarah M.', job: 'Infirmière, Lyon', save: '213€/mois', text: "En 3 minutes, FLUX a trouvé 9 abonnements que j'avais oubliés. Incroyable.", avatar: 'SM' },
+              { name: 'Sarah M.', job: 'Infirmière, Lyon', save: '213€/mois', text: "En 3 minutes, MANA a trouvé 9 abonnements que j'avais oubliés. Incroyable.", avatar: 'SM' },
               { name: 'Thomas K.', job: 'Freelance, Paris', save: '89€/mois', text: "Mon forfait SFR est passé de 39€ à 19€ sans que je fasse quoi que ce soit.", avatar: 'TK' },
               { name: 'Famille Durand', job: 'Bordeaux', save: '334€/mois', text: "7 doublons détectés entre nos 4 comptes. 334€ récupérés chaque mois.", avatar: 'FD' },
             ].map((t, i) => (
@@ -727,8 +747,8 @@ export default function Landing() {
         <div style={{ position: 'relative', ...fadeUp(v4) }}>
           <div style={{ fontSize: 11, color: `${C.cyan}80`, letterSpacing: 3, marginBottom: 16, fontFamily: MONO }}>REJOINS 94 000+ MEMBRES</div>
           <h2 style={{ fontFamily: HEADING, fontSize: 'clamp(32px,5vw,56px)', fontWeight: 700, color: C.text, letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1.1 }}>
-            Libère ton{' '}
-            <em style={{ fontStyle: 'italic', background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>flux.</em>
+            Reprends ton{' '}
+            <em style={{ fontStyle: 'italic', background: `linear-gradient(135deg, ${C.cyan}, ${C.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MANA.</em>
           </h2>
           <p style={{ color: C.muted, fontSize: 17, marginBottom: 44 }}>Analyse gratuite · 3 minutes · Aucune carte bancaire</p>
           <button className="cta-flux" onClick={() => setShowForm(true)} style={{
@@ -737,7 +757,7 @@ export default function Landing() {
             fontFamily: HEADING, boxShadow: `0 12px 40px rgba(0,0,0,0.3), 0 0 20px ${C.cyanGlow}`,
             display: 'inline-flex', alignItems: 'center', gap: 12,
           }}>
-            🌊 Voir mes économies maintenant
+            🌊 Récupérer mon MANA maintenant
           </button>
           <div style={{ marginTop: 20, fontSize: 12, color: C.faint, fontFamily: MONO }}>DONNÉES HÉBERGÉES EN FRANCE · 100% RGPD · JAMAIS REVENDUES</div>
         </div>
@@ -755,13 +775,13 @@ export default function Landing() {
             fontFamily: HEADING, fontWeight: 700, fontSize: 18,
             background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>FLUX</span>
+          }}>MANA</span>
         </div>
         <div style={{ fontSize: 11, color: C.faint, fontFamily: MONO }}>
-          © 2026 FLUX · Tous droits réservés · Mentions légales · CGU
+          © 2026 MANA · Tous droits réservés · Mentions légales · CGU
         </div>
         <div style={{ fontSize: 11, color: C.faint, fontFamily: MONO }}>
-          Libère ton flux 🌊
+          Reprends ton MANA 🌊
         </div>
       </footer>
     </div>

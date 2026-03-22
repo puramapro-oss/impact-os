@@ -2,22 +2,25 @@
 
 ## Identité du projet
 
-- **Nom** : FLUX (anciennement LUMIOS)
-- **Tagline** : "Libère ton flux."
+- **Nom** : MANA (anciennement FLUX / LUMIOS)
+- **Tagline** : "Reprends ton MANA."
+- **Sous-titre** : "L'énergie de ton argent t'appartient."
 - **Stack** : React 19 + Vite 8 + React Router 7 + Recharts + Lucide React
 - **Langage** : JavaScript (JSX), pas de TypeScript
 - **Styling** : CSS variables globales + inline styles
 
-## Design System FLUX
+## Design System MANA
 
-- Fond principal : `#050810` (nuit profonde)
-- Accent cyan : `#6EE7F7` (eau)
-- Accent violet : `#818CF8` (énergie)
+- Fond principal : `#040B14` (nuit océan profond)
+- Accent turquoise : `#22D3EE` (turquoise polynésien)
+- Accent or : `#F59E0B` (or sacré)
+- Accent émeraude : `#10B981` (vert émeraude)
 - Titres : Cormorant Garamond (Google Fonts)
 - Body : DM Sans
 - Mono : Courier New / monospace
 - Border-radius cards : 12-24px
 - Animations : flux, ondulations, transitions fluides
+- Logo : 🌊
 
 ## Règles absolues
 
