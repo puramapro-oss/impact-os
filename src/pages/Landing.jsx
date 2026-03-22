@@ -65,12 +65,281 @@ function WaveBackground() {
   );
 }
 
+// ─── FORM STEPS ──────────────────────────────────────────────
+const STEPS = [
+  {
+    id: 'situation', title: 'Tu es…', subtitle: 'Pour personnaliser ton analyse',
+    type: 'cards',
+    options: [
+      { id: 'solo', icon: '🧑', label: 'Seul(e)' },
+      { id: 'couple', icon: '👫', label: 'En couple' },
+      { id: 'famille', icon: '👨‍👩‍👧', label: 'En famille' },
+      { id: 'pro', icon: '💼', label: 'Entrepreneur' },
+    ],
+  },
+  {
+    id: 'abonnements', title: "Tu as combien d'abonnements ?", subtitle: 'Une estimation suffit',
+    type: 'slider', min: 1, max: 25, default: 8,
+    label: (v) => v <= 4 ? 'Peu (1-4)' : v <= 10 ? 'Quelques-uns (5-10)' : v <= 18 ? 'Beaucoup (11-18)' : 'Énormément (19+)',
+  },
+  {
+    id: 'categories', title: 'Qu\'est-ce que tu paies chaque mois ?', subtitle: 'Sélectionne tout ce qui s\'applique',
+    type: 'multi',
+    options: [
+      { id: 'streaming', icon: '🎬', label: 'Streaming (Netflix, Disney...)' },
+      { id: 'mobile', icon: '📱', label: 'Forfait mobile' },
+      { id: 'box', icon: '📡', label: 'Box Internet & TV' },
+      { id: 'assurance', icon: '🛡️', label: 'Assurances' },
+      { id: 'energie', icon: '⚡', label: 'Électricité / Gaz' },
+      { id: 'banque', icon: '🏦', label: 'Compte bancaire payant' },
+      { id: 'sport', icon: '💪', label: 'Salle de sport / appli sport' },
+      { id: 'musique', icon: '🎵', label: 'Musique (Spotify, Deezer...)' },
+      { id: 'logiciels', icon: '💻', label: 'Logiciels (Adobe, Office...)' },
+    ],
+  },
+  {
+    id: 'contact', title: "Où t'envoyer ton analyse ?",
+    subtitle: 'Gratuit, sans engagement, résultat immédiat',
+    type: 'contact',
+  },
+];
+
+// ─── SUPABASE SAVE ────────────────────────────────────────────
+async function saveLead(data) {
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseKey) return;
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    await supabase.from('leads').insert([data]);
+  } catch (_) {
+    /* silently fail — form still shows success */
+  }
+}
+
+// ─── FORM MODAL ───────────────────────────────────────────────
+function FluxForm({ onClose }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState({ abonnements: 8, categories: [] });
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const current = STEPS[step];
+
+  const savings = Math.round(
+    ((answers.abonnements ?? 8) * 14) *
+    ((answers.categories?.length ?? 3) / 10) * 1.4
+  );
+
+  const canNext = () => {
+    if (current.type === 'cards') return !!answers[current.id];
+    if (current.type === 'multi') return (answers.categories?.length ?? 0) > 0;
+    if (current.type === 'slider') return true;
+    if (current.type === 'contact') return (answers.email ?? '').includes('@');
+    return true;
+  };
+
+  const toggleCat = (id) => {
+    setAnswers(a => ({
+      ...a,
+      categories: (a.categories ?? []).includes(id)
+        ? a.categories.filter(c => c !== id)
+        : [...(a.categories ?? []), id],
+    }));
+  };
+
+  const handleNext = () => { if (step < STEPS.length - 1) setStep(s => s + 1); };
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    await saveLead({
+      situation: answers.situation ?? '',
+      abonnements: answers.abonnements ?? 8,
+      categories: answers.categories ?? [],
+      prenom: answers.prenom ?? '',
+      nom: answers.nom ?? '',
+      email: answers.email ?? '',
+      tel: answers.tel ?? '',
+      savings_estimate: savings,
+      created_at: new Date().toISOString(),
+    });
+    setTimeout(() => { setSubmitting(false); setDone(true); }, 1600);
+  };
+
+  // ── DONE SCREEN ──
+  if (done) return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(5,8,16,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: C.bgCard, borderRadius: 28, padding: '52px 40px', maxWidth: 440, width: '100%', textAlign: 'center', boxShadow: `0 32px 80px rgba(0,0,0,0.5), 0 0 40px ${C.cyanGlow}`, border: `1px solid ${C.border}` }}>
+        <div style={{ fontSize: 72, marginBottom: 20 }}>🎉</div>
+        <h2 style={{ fontFamily: HEADING, fontSize: 30, color: C.text, marginBottom: 12, fontWeight: 700 }}>Ton analyse est prête !</h2>
+        <p style={{ color: C.muted, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+          On a détecté <strong style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>~{savings}€/mois</strong> d'économies potentielles.<br />
+          Vérifie ta boîte mail — ton rapport arrive dans 2 minutes.
+        </p>
+        <div style={{ background: `${C.cyan}08`, border: `1px solid ${C.border}`, borderRadius: 16, padding: '16px 20px', marginBottom: 28, textAlign: 'left' }}>
+          {[
+            `✅ ${answers.abonnements ?? 8} abonnements analysés`,
+            `✅ ${answers.categories?.length ?? 0} catégories passées au crible`,
+            `✅ Meilleures offres du marché identifiées`,
+            `✅ Rapport PDF personnalisé en cours`,
+          ].map((l, i) => <div key={i} style={{ fontSize: 13, color: C.cyan, padding: '4px 0', fontFamily: MONO }}>{l}</div>)}
+        </div>
+        <button onClick={onClose} style={{ background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, color: C.bg, border: 'none', borderRadius: 14, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', width: '100%', fontFamily: HEADING }}>
+          Fermer
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── FORM STEPS ──
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(5,8,16,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <style>{`
+        @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:none}}
+        @keyframes stepIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+        .opt-card{cursor:pointer;transition:all .2s}
+        .opt-card:hover{transform:translateY(-2px)}
+      `}</style>
+      <div style={{ background: C.bgCard, borderRadius: 28, width: '100%', maxWidth: 500, boxShadow: `0 40px 100px rgba(0,0,0,0.5), 0 0 40px ${C.cyanGlow}`, animation: 'modalIn .35s ease', overflow: 'hidden', border: `1px solid ${C.border}` }}>
+        {/* Progress bar */}
+        <div style={{ height: 4, background: `${C.bg}` }}>
+          <div style={{ height: '100%', background: `linear-gradient(90deg, ${C.cyan}, ${C.violet})`, width: `${((step + 1) / STEPS.length) * 100}%`, transition: 'width .5s ease', borderRadius: '0 2px 2px 0' }} />
+        </div>
+        {/* Header */}
+        <div style={{ padding: '28px 32px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontSize: 11, color: C.cyan, letterSpacing: 2, marginBottom: 6, fontFamily: MONO }}>
+              ÉTAPE {step + 1} / {STEPS.length}
+            </div>
+            <h2 style={{ fontFamily: HEADING, fontSize: 26, color: C.text, fontWeight: 700, lineHeight: 1.2, marginBottom: 4 }}>{current.title}</h2>
+            <p style={{ fontSize: 13, color: C.muted }}>{current.subtitle}</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.faint, fontSize: 22, lineHeight: 1, padding: 4 }}>✕</button>
+        </div>
+        {/* Savings preview */}
+        {step >= 1 && (
+          <div style={{ margin: '16px 32px 0', background: `${C.violet}12`, border: `1px solid ${C.violet}30`, borderRadius: 12, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, color: C.muted }}>Économies estimées</span>
+            <span style={{ fontSize: 20, fontWeight: 700, fontFamily: HEADING, background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>~{savings}€/mois</span>
+          </div>
+        )}
+        {/* Step content */}
+        <div style={{ padding: '20px 32px 28px', animation: 'stepIn .25s ease' }}>
+          {/* CARDS */}
+          {current.type === 'cards' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {current.options.map(o => {
+                const sel = answers[current.id] === o.id;
+                return (
+                  <div key={o.id} className="opt-card" onClick={() => setAnswers(a => ({ ...a, [current.id]: o.id }))}
+                    style={{ padding: '18px 14px', borderRadius: 16, border: `2px solid ${sel ? C.cyan : C.border}`, background: sel ? C.cyanDim : C.bg, textAlign: 'center' }}>
+                    <div style={{ fontSize: 32, marginBottom: 6 }}>{o.icon}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: sel ? C.cyan : C.text }}>{o.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {/* SLIDER */}
+          {current.type === 'slider' && (
+            <div>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <div style={{ fontSize: 56, fontWeight: 700, fontFamily: HEADING, lineHeight: 1, background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{answers.abonnements}</div>
+                <div style={{ fontSize: 14, color: C.muted, marginTop: 4 }}>{current.label(answers.abonnements)}</div>
+              </div>
+              <input type="range" min={current.min} max={current.max} value={answers.abonnements}
+                onChange={e => setAnswers(a => ({ ...a, abonnements: +e.target.value }))}
+                style={{ width: '100%', accentColor: C.cyan, height: 6, cursor: 'pointer', marginBottom: 12 }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.faint, fontFamily: MONO }}>
+                <span>{current.min}</span><span>{current.max}</span>
+              </div>
+            </div>
+          )}
+          {/* MULTI SELECT */}
+          {current.type === 'multi' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {current.options.map(o => {
+                const sel = (answers.categories ?? []).includes(o.id);
+                return (
+                  <div key={o.id} className="opt-card" onClick={() => toggleCat(o.id)}
+                    style={{ padding: '12px 14px', borderRadius: 12, border: `2px solid ${sel ? C.cyan : C.border}`, background: sel ? C.cyanDim : C.bg, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 20 }}>{o.icon}</span>
+                    <span style={{ fontSize: 12, fontWeight: sel ? 700 : 400, color: sel ? C.cyan : C.text, lineHeight: 1.3 }}>{o.label}</span>
+                    {sel && <span style={{ marginLeft: 'auto', color: C.cyan, fontSize: 14 }}>✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {/* CONTACT */}
+          {current.type === 'contact' && (
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {[
+                  { key: 'prenom', label: 'Prénom', placeholder: 'Marie', type: 'text' },
+                  { key: 'nom', label: 'Nom', placeholder: 'Dupont', type: 'text' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontFamily: MONO }}>{f.label}</div>
+                    <input type={f.type} placeholder={f.placeholder} value={answers[f.key] ?? ''}
+                      onChange={e => setAnswers(a => ({ ...a, [f.key]: e.target.value }))}
+                      style={{ width: '100%', background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: C.text, fontFamily: BODY, outline: 'none' }} />
+                  </div>
+                ))}
+              </div>
+              {[
+                { key: 'email', label: 'Email', placeholder: 'marie@email.com', type: 'email' },
+                { key: 'tel', label: 'Téléphone (optionnel)', placeholder: '06 12 34 56 78', type: 'tel' },
+              ].map(f => (
+                <div key={f.key}>
+                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontFamily: MONO }}>{f.label}</div>
+                  <input type={f.type} placeholder={f.placeholder} value={answers[f.key] ?? ''}
+                    onChange={e => setAnswers(a => ({ ...a, [f.key]: e.target.value }))}
+                    style={{ width: '100%', background: C.bg, border: `1.5px solid ${(answers.email ?? '').includes('@') && f.key === 'email' ? C.cyan : C.border}`, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: C.text, fontFamily: BODY, outline: 'none' }} />
+                </div>
+              ))}
+              <div style={{ fontSize: 11, color: C.faint, fontFamily: MONO }}>
+                🔒 Données 100% sécurisées · Jamais revendues · RGPD
+              </div>
+            </div>
+          )}
+          {/* CTA Button */}
+          <div style={{ marginTop: 24 }}>
+            {step < STEPS.length - 1 ? (
+              <button onClick={handleNext} disabled={!canNext()}
+                style={{ width: '100%', background: canNext() ? `linear-gradient(135deg, ${C.cyan}, ${C.violet})` : C.border, color: canNext() ? C.bg : C.faint, border: 'none', borderRadius: 14, padding: 18, fontSize: 16, fontWeight: 700, cursor: canNext() ? 'pointer' : 'default', fontFamily: HEADING, transition: 'all .2s' }}>
+                Continuer →
+              </button>
+            ) : (
+              <button onClick={handleSubmit} disabled={!canNext() || submitting}
+                style={{ width: '100%', background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, color: C.bg, border: 'none', borderRadius: 14, padding: 18, fontSize: 16, fontWeight: 700, cursor: canNext() ? 'pointer' : 'default', fontFamily: HEADING, position: 'relative', overflow: 'hidden' }}>
+                {submitting ? (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                    <span style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${C.bg}40`, borderTop: `2px solid ${C.bg}`, display: 'inline-block', animation: 'spin .7s linear infinite' }} />
+                    Analyse en cours...
+                  </span>
+                ) : '🔍 Obtenir mon analyse gratuite'}
+              </button>
+            )}
+            {step > 0 && (
+              <button onClick={() => setStep(s => s - 1)} style={{ width: '100%', background: 'none', border: 'none', color: C.faint, cursor: 'pointer', marginTop: 10, fontSize: 13, fontFamily: BODY }}>
+                ← Retour
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const r1 = useRef(), r2 = useRef(), r3 = useRef();
-  const v1 = useVisible(r1), v2 = useVisible(r2), v3 = useVisible(r3);
+  const [showForm, setShowForm] = useState(false);
+  const r1 = useRef(), r2 = useRef(), r3 = useRef(), r4 = useRef();
+  const v1 = useVisible(r1), v2 = useVisible(r2), v3 = useVisible(r3), v4 = useVisible(r4);
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 80);
@@ -106,6 +375,8 @@ export default function Landing() {
         .nav-link:hover { color: ${C.cyan}!important; }
       `}</style>
 
+      {showForm && <FluxForm onClose={() => setShowForm(false)} />}
+
       {/* ── NAV ─────────────────────────────────────────── */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
@@ -139,7 +410,7 @@ export default function Landing() {
             borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600,
             cursor: 'pointer', fontFamily: BODY, transition: 'all .2s',
           }}>Connexion</button>
-          <button className="cta-flux" onClick={() => navigate('/register')} style={{
+          <button className="cta-flux" onClick={() => setShowForm(true)} style={{
             background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
             color: C.bg, border: 'none', borderRadius: 10, padding: '8px 22px',
             fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: BODY,
@@ -194,7 +465,7 @@ export default function Landing() {
               <strong style={{ color: C.text }}>Gratuit. 3 minutes. Résultat garanti.</strong>
             </p>
             <div style={fadeUp(mounted, '0.3s')}>
-              <button className="cta-flux" onClick={() => navigate('/register')} style={{
+              <button className="cta-flux" onClick={() => setShowForm(true)} style={{
                 background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
                 color: C.bg, border: 'none', borderRadius: 16,
                 padding: '20px 44px', fontSize: 18, fontWeight: 700,
@@ -381,7 +652,7 @@ export default function Landing() {
             ))}
           </div>
           <div style={{ ...fadeUp(v2, '0.4s'), textAlign: 'center', marginTop: 52 }}>
-            <button className="cta-flux" onClick={() => navigate('/register')} style={{
+            <button className="cta-flux" onClick={() => setShowForm(true)} style={{
               background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
               color: C.bg, border: 'none', borderRadius: 14,
               padding: '18px 44px', fontSize: 16, fontWeight: 700,
@@ -446,9 +717,33 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── PLACEHOLDER — Partie 3 à venir (CTA final + Footer complet) ── */}
+      {/* ── FINAL CTA ────────────────────────────────────── */}
+      <section ref={r4} style={{
+        padding: '100px 48px', background: '#0a1a2a', position: 'relative',
+        overflow: 'hidden', textAlign: 'center',
+      }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `radial-gradient(${C.cyan}08 1px, transparent 1px)`, backgroundSize: '32px 32px', opacity: 0.5, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, borderRadius: '50%', background: `radial-gradient(circle, ${C.cyanDim} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', ...fadeUp(v4) }}>
+          <div style={{ fontSize: 11, color: `${C.cyan}80`, letterSpacing: 3, marginBottom: 16, fontFamily: MONO }}>REJOINS 94 000+ MEMBRES</div>
+          <h2 style={{ fontFamily: HEADING, fontSize: 'clamp(32px,5vw,56px)', fontWeight: 700, color: C.text, letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1.1 }}>
+            Libère ton{' '}
+            <em style={{ fontStyle: 'italic', background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>flux.</em>
+          </h2>
+          <p style={{ color: C.muted, fontSize: 17, marginBottom: 44 }}>Analyse gratuite · 3 minutes · Aucune carte bancaire</p>
+          <button className="cta-flux" onClick={() => setShowForm(true)} style={{
+            background: C.text, color: C.bg, border: 'none', borderRadius: 16,
+            padding: '22px 56px', fontSize: 19, fontWeight: 700, cursor: 'pointer',
+            fontFamily: HEADING, boxShadow: `0 12px 40px rgba(0,0,0,0.3), 0 0 20px ${C.cyanGlow}`,
+            display: 'inline-flex', alignItems: 'center', gap: 12,
+          }}>
+            🌊 Voir mes économies maintenant
+          </button>
+          <div style={{ marginTop: 20, fontSize: 12, color: C.faint, fontFamily: MONO }}>DONNÉES HÉBERGÉES EN FRANCE · 100% RGPD · JAMAIS REVENDUES</div>
+        </div>
+      </section>
 
-      {/* ── FOOTER MINIMAL ───────────────────────────────── */}
+      {/* ── FOOTER ───────────────────────────────────────── */}
       <footer style={{
         padding: '32px 48px', borderTop: `1px solid ${C.border}`,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
