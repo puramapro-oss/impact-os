@@ -69,6 +69,8 @@ export default function Landing() {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const r1 = useRef(), r2 = useRef(), r3 = useRef();
+  const v1 = useVisible(r1), v2 = useVisible(r2), v3 = useVisible(r3);
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 80);
@@ -307,12 +309,144 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* ── PLACEHOLDER — Parties 2 & 3 à venir ─────────── */}
-      <section style={{ padding: '120px 48px', textAlign: 'center' }}>
-        <p style={{ color: C.faint, fontFamily: MONO, fontSize: 13 }}>
-          Sections suivantes en cours d'intégration...
-        </p>
+      {/* ── STATS ────────────────────────────────────────── */}
+      <section ref={r1} style={{ padding: '80px 48px', background: `${C.bgCard}80` }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20 }}>
+          {[
+            { n: '487€', l: 'gaspillés/mois en moyenne' },
+            { n: '47%', l: "d'abonnements inutilisés" },
+            { n: '156€', l: 'économisés/mois par nos membres' },
+            { n: '94k+', l: 'Français nous font confiance' },
+          ].map((s, i) => (
+            <div key={i} style={{
+              ...fadeUp(v1, `${i * 0.1}s`),
+              background: C.bgCard, borderRadius: 20, padding: '28px 24px',
+              textAlign: 'center', border: `1px solid ${C.border}`,
+              boxShadow: `0 2px 16px rgba(0,0,0,0.2)`,
+              transition: 'transform .3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <div style={{
+                fontSize: 40, fontWeight: 700, fontFamily: HEADING,
+                letterSpacing: '-0.03em', marginBottom: 8,
+                background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>{s.n}</div>
+              <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
       </section>
+
+      {/* ── HOW IT WORKS ─────────────────────────────────── */}
+      <section ref={r2} style={{ padding: '100px 48px', position: 'relative' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ ...fadeUp(v2), textAlign: 'center', marginBottom: 64 }}>
+            <div style={{ fontSize: 11, color: C.cyan, letterSpacing: 3, marginBottom: 12, fontFamily: MONO }}>COMMENT ÇA MARCHE</div>
+            <h2 style={{ fontFamily: HEADING, fontSize: 42, fontWeight: 700, color: C.text, letterSpacing: '-0.03em' }}>
+              Simple comme <em style={{
+                fontStyle: 'italic',
+                background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>bonjour</em>
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, position: 'relative' }}>
+            {/* Connector line */}
+            <div style={{
+              position: 'absolute', top: 44, left: '16.66%', right: '16.66%',
+              height: 1, background: `linear-gradient(90deg, ${C.cyan}40, ${C.violet}40)`, zIndex: 0,
+            }} />
+            {[
+              { icon: '🔍', title: 'Tu réponds à 4 questions', desc: 'En moins de 3 minutes. Sur tes abonnements actuels.' },
+              { icon: '🤖', title: 'FLUX analyse tout', desc: 'Notre IA compare 200+ offres pour trouver les moins chères.' },
+              { icon: '💰', title: 'Tu économises', desc: "On s'occupe de tout : résiliations, négociations, switches." },
+            ].map((s, i) => (
+              <div key={i} style={{ ...fadeUp(v2, `${i * 0.15}s`), textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                <div style={{
+                  width: 88, height: 88, borderRadius: '50%',
+                  background: i === 1 ? `linear-gradient(135deg, ${C.cyan}, ${C.violet})` : C.bgCard,
+                  border: `2px solid ${i === 1 ? 'transparent' : C.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 20px', fontSize: 36,
+                  boxShadow: i === 1 ? `0 8px 32px ${C.cyanGlow}` : 'none',
+                }}>
+                  {s.icon}
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 8, fontFamily: HEADING, letterSpacing: '-0.01em' }}>{s.title}</div>
+                <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>{s.desc}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...fadeUp(v2, '0.4s'), textAlign: 'center', marginTop: 52 }}>
+            <button className="cta-flux" onClick={() => navigate('/register')} style={{
+              background: `linear-gradient(135deg, ${C.cyan}, ${C.violet})`,
+              color: C.bg, border: 'none', borderRadius: 14,
+              padding: '18px 44px', fontSize: 16, fontWeight: 700,
+              cursor: 'pointer', fontFamily: HEADING,
+              boxShadow: `0 8px 28px ${C.cyanGlow}`,
+            }}>
+              Commencer — c'est gratuit
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ─────────────────────────────────── */}
+      <section ref={r3} style={{ padding: '80px 48px', background: `${C.bgCard}80` }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ ...fadeUp(v3), textAlign: 'center', marginBottom: 52 }}>
+            <div style={{ fontSize: 11, color: C.cyan, letterSpacing: 3, marginBottom: 12, fontFamily: MONO }}>ILS ÉCONOMISENT DÉJÀ</div>
+            <h2 style={{ fontFamily: HEADING, fontSize: 38, fontWeight: 700, color: C.text, letterSpacing: '-0.03em' }}>
+              Ce qu'ils en pensent
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+            {[
+              { name: 'Sarah M.', job: 'Infirmière, Lyon', save: '213€/mois', text: "En 3 minutes, FLUX a trouvé 9 abonnements que j'avais oubliés. Incroyable.", avatar: 'SM' },
+              { name: 'Thomas K.', job: 'Freelance, Paris', save: '89€/mois', text: "Mon forfait SFR est passé de 39€ à 19€ sans que je fasse quoi que ce soit.", avatar: 'TK' },
+              { name: 'Famille Durand', job: 'Bordeaux', save: '334€/mois', text: "7 doublons détectés entre nos 4 comptes. 334€ récupérés chaque mois.", avatar: 'FD' },
+            ].map((t, i) => (
+              <div key={i} style={{
+                ...fadeUp(v3, `${i * 0.1}s`),
+                background: C.bgCard, borderRadius: 24, padding: 28,
+                border: `1px solid ${C.border}`,
+                boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
+                transition: 'transform .3s, box-shadow .3s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.3), 0 0 12px ${C.cyanGlow}`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.2)'; }}
+              >
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${C.cyanDim}, ${C.violetDim})`,
+                    border: `2px solid ${C.border}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 900, color: C.cyan, fontFamily: MONO,
+                  }}>{t.avatar}</div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>{t.job}</div>
+                  </div>
+                  <div style={{
+                    marginLeft: 'auto',
+                    background: C.cyanDim, borderRadius: 100,
+                    padding: '4px 12px', fontSize: 12, fontWeight: 700,
+                    color: C.cyan, fontFamily: MONO,
+                    border: `1px solid ${C.border}`,
+                  }}>+{t.save}</div>
+                </div>
+                <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.8, fontStyle: 'italic' }}>"{t.text}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PLACEHOLDER — Partie 3 à venir (CTA final + Footer complet) ── */}
 
       {/* ── FOOTER MINIMAL ───────────────────────────────── */}
       <footer style={{
