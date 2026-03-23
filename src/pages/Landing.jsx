@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../lib/supabase';
 
 /* ═══════════════════════════════════════════════════
    MANA — Landing page
@@ -112,12 +113,8 @@ const STEPS = [
 // ─── SUPABASE SAVE ────────────────────────────────────────────
 async function saveLead(data) {
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseKey) return;
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    await supabase.from('leads').insert([data]);
+    const { error } = await supabase.from('leads').insert([data]);
+    if (error) throw error;
   } catch (_) {
     /* silently fail — form still shows success */
   }
