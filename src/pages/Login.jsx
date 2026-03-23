@@ -1,20 +1,34 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Loader } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('sophie.martin@aigles-lyon.fr');
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email.trim()) { setError('Veuillez saisir votre email'); return; }
     if (!password.trim()) { setError('Veuillez saisir votre mot de passe'); return; }
     setError('');
-    navigate('/dashboard');
+    setLoading(true);
+
+    const { error: authError } = await signIn(email, password);
+    setLoading(false);
+
+    if (authError) {
+      setError(authError.message === 'Invalid login credentials'
+        ? 'Email ou mot de passe incorrect'
+        : authError.message);
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -81,14 +95,15 @@ export default function Login() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer' }}>
-              <input type="checkbox" defaultChecked style={{ accentColor: 'var(--accent-green)' }} />
+              <input type="checkbox" defaultChecked style={{ accentColor: '#f59e0b' }} />
               Se souvenir de moi
             </label>
             <span style={{ fontSize: 13, color: '#f59e0b', cursor: 'pointer' }}>Mot de passe oublié ?</span>
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15 }}>
-            Se connecter <ArrowRight size={18} />
+          <button type="submit" className="btn-primary" disabled={loading}
+            style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15, opacity: loading ? 0.7 : 1 }}>
+            {loading ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Connexion...</> : <>Se connecter <ArrowRight size={18} /></>}
           </button>
         </form>
 
@@ -99,6 +114,7 @@ export default function Login() {
           </span>
         </p>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

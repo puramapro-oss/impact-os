@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Building2, ArrowRight, Eye, EyeOff, Check } from 'lucide-react';
+import { User, Mail, Lock, Building2, ArrowRight, Eye, EyeOff, Check, Loader } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [form, setForm] = useState({ prenom: '', nom: '', email: '', organisation: '', password: '', confirmPassword: '' });
   const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const validate = () => {
     const e = {};
@@ -21,11 +25,25 @@ export default function Register() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
-    if (Object.keys(errs).length === 0) navigate('/dashboard');
+    if (Object.keys(errs).length > 0) return;
+
+    setLoading(true);
+    const { error: authError } = await signUp(form.email, form.password, {
+      prenom: form.prenom,
+      nom: form.nom,
+      organisation: form.organisation,
+    });
+    setLoading(false);
+
+    if (authError) {
+      setErrors({ general: authError.message });
+    } else {
+      setSuccess(true);
+    }
   };
 
   const pwdChecks = [
@@ -56,6 +74,33 @@ export default function Register() {
     </div>
   );
 
+  if (success) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'var(--bg-primary)', padding: 24,
+      }}>
+        <div style={{ width: '100%', maxWidth: 460, textAlign: 'center' }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 16, margin: '0 auto 20px',
+            background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Check size={32} color="#10b981" />
+          </div>
+          <h1 style={{ fontSize: 28, marginBottom: 12, fontFamily: 'var(--font-heading)' }}>Compte créé !</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.7 }}>
+            Un email de confirmation a été envoyé à <strong style={{ color: 'var(--text-primary)' }}>{form.email}</strong>.
+            Vérifiez votre boîte de réception pour activer votre compte LUMIOS.
+          </p>
+          <button onClick={() => navigate('/login')} className="btn-primary" style={{ padding: '12px 32px', fontSize: 15 }}>
+            Aller à la connexion <ArrowRight size={18} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -77,6 +122,15 @@ export default function Register() {
         </div>
 
         <form onSubmit={handleSubmit} className="glass-card" style={{ padding: 28 }}>
+          {errors.general && (
+            <div style={{
+              padding: '10px 14px', borderRadius: 8, marginBottom: 16,
+              background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)',
+              fontSize: 13, color: 'var(--accent-red)',
+            }}>
+              {errors.general}
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Field label="Prénom" field="prenom" icon={User} placeholder="Sophie" />
             <Field label="Nom" field="nom" icon={User} placeholder="Martin" />
@@ -87,7 +141,7 @@ export default function Register() {
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
             {pwdChecks.map((c, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: c.ok ? 'var(--accent-green)' : 'var(--text-muted)' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: c.ok ? '#10b981' : 'var(--text-muted)' }}>
                 <Check size={12} /> {c.label}
               </div>
             ))}
@@ -100,8 +154,9 @@ export default function Register() {
             <span>J'accepte les <span style={{ color: '#f59e0b' }}>Conditions Générales d'Utilisation</span> et la <span style={{ color: '#f59e0b' }}>Politique de Confidentialité</span></span>
           </label>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15 }}>
-            Créer mon compte <ArrowRight size={18} />
+          <button type="submit" className="btn-primary" disabled={loading}
+            style={{ width: '100%', justifyContent: 'center', padding: '12px 24px', fontSize: 15, opacity: loading ? 0.7 : 1 }}>
+            {loading ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Création...</> : <>Créer mon compte <ArrowRight size={18} /></>}
           </button>
         </form>
 
@@ -112,6 +167,7 @@ export default function Register() {
           </span>
         </p>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
