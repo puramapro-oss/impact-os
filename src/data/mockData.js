@@ -197,6 +197,14 @@ export const journalAudit = [
   { id: 15, timestamp: Date.now() - 48 * 3600 * 1000, utilisateur: 'LUMIOS (IA)', action: 'Conformité vérifiée', details: 'Audit RGPD automatique : toutes les données conformes', type: 'ia', niveau: 'success' },
 ];
 
+export const deals = [
+  { id: 1, service: 'Box SFR', actionType: 'switch', actionLabel: 'Passer chez Free', currentPrice: 39.99, newPrice: 19.99, icon: '📡', category: 'Internet' },
+  { id: 2, service: 'Assurance AXA Habitation', actionType: 'renegociation', actionLabel: 'Renégocier via courtier MANA', currentPrice: 28.50, newPrice: 6.58, icon: '🏠', category: 'Assurance' },
+  { id: 3, service: 'Netflix Premium', actionType: 'downgrade', actionLabel: 'Passer en Standard avec pub', currentPrice: 17.99, newPrice: 5.99, icon: '🎬', category: 'Streaming' },
+  { id: 4, service: 'Salle Basic-Fit', actionType: 'resiliation', actionLabel: 'Résilier (inutilisé depuis 4 mois)', currentPrice: 29.99, newPrice: 0, icon: '💪', category: 'Sport' },
+  { id: 5, service: 'Forfait Orange 100Go', actionType: 'switch', actionLabel: 'Passer chez B&You 130Go', currentPrice: 24.99, newPrice: 9.99, icon: '📱', category: 'Mobile' },
+];
+
 export const historiqueResoutre = [
   { id: 1, question: 'Comment organiser notre AG annuelle ?', date: Date.now() - 2 * 24 * 3600 * 1000, statut: 'Résolu' },
   { id: 2, question: 'Quelles subventions sont disponibles pour le sport jeunesse ?', date: Date.now() - 3 * 24 * 3600 * 1000, statut: 'Résolu' },

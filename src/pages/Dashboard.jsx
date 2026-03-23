@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Zap, Clock, Euro, TrendingUp, FileText, Mail,
-  ArrowUpRight, ArrowDownRight, Play, CheckCircle, ChevronRight
+  ArrowUpRight, ArrowDownRight, Play, CheckCircle, ChevronRight,
+  ArrowRight, Sparkles
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import { kpis, chartData7Days, chartData6Months, activitesRecentes, planDuJour, currentUser } from '../data/mockData';
+import { kpis, chartData7Days, chartData6Months, activitesRecentes, planDuJour, currentUser, deals } from '../data/mockData';
 import { getGreeting, formatRelativeTime } from '../hooks/useRelativeTime';
 import { useToast } from '../contexts/ToastContext';
+import MandateModal from '../components/ui/MandateModal';
 
 const iconMap = { Zap, Clock, Euro, TrendingUp, FileText, Mail };
 const colorMap = { blue: '#3b82f6', green: '#10b981', gold: '#f59e0b', purple: '#8b5cf6' };
@@ -90,10 +92,21 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function Dashboard() {
   const { addToast } = useToast();
   const [actions, setActions] = useState(planDuJour);
+  const [mandateDeal, setMandateDeal] = useState(null);
+  const [signedDeals, setSignedDeals] = useState([]);
 
   const handleExecute = (id) => {
     setActions(prev => prev.map(a => a.id === id ? { ...a, statut: 'done' } : a));
     addToast('Action exécutée avec succès', 'success');
+  };
+
+  const handleAcceptDeal = (deal) => {
+    setMandateDeal(deal);
+  };
+
+  const handleMandateSuccess = (dealId) => {
+    setSignedDeals(prev => [...prev, dealId]);
+    addToast('Mandat signé — MANA s\'en occupe !', 'success');
   };
 
   return (
@@ -151,6 +164,94 @@ export default function Dashboard() {
               <Bar dataKey="depenses" fill="#2563eb" radius={[4, 4, 0, 0]} name="Dépenses (€)" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Mandate Modal */}
+      <MandateModal
+        isOpen={!!mandateDeal}
+        onClose={() => setMandateDeal(null)}
+        deal={mandateDeal}
+        onSuccess={handleMandateSuccess}
+      />
+
+      {/* Deals — Recommandations MANA */}
+      <div className="glass-card" style={{ padding: 20, marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Sparkles size={18} color="#f59e0b" />
+            <h3 style={{ fontSize: 16, margin: 0 }}>Deals détectés par MANA</h3>
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            {deals.length} opportunités · {deals.reduce((s, d) => s + (d.currentPrice - d.newPrice), 0).toFixed(0)}€/mois d'économies
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {deals.map((deal) => {
+            const saving = deal.currentPrice - deal.newPrice;
+            const signed = signedDeals.includes(deal.id);
+            return (
+              <div key={deal.id} style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '14px 16px', borderRadius: 12,
+                border: `1px solid ${signed ? 'rgba(16,185,129,0.3)' : 'var(--border-color)'}`,
+                background: signed ? 'rgba(16,185,129,0.04)' : 'transparent',
+                transition: 'all 0.2s ease',
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: 'rgba(34,211,238,0.08)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, flexShrink: 0,
+                }}>{deal.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>{deal.service}</span>
+                    <span className="badge badge-gold" style={{ fontSize: 10 }}>{deal.category}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{deal.actionLabel}</div>
+                </div>
+                <div style={{ textAlign: 'right', marginRight: 12, flexShrink: 0 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                    {deal.currentPrice.toFixed(2)}€/mois
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent-green)' }}>
+                    {deal.newPrice.toFixed(2)}€/mois
+                  </div>
+                </div>
+                <div style={{
+                  background: 'rgba(16,185,129,0.08)', borderRadius: 8,
+                  padding: '4px 10px', flexShrink: 0,
+                }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-green)', fontFamily: 'var(--font-heading)' }}>
+                    −{saving.toFixed(0)}€
+                  </div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>/mois</div>
+                </div>
+                {signed ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--accent-green)', fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+                    <CheckCircle size={16} /> Signé
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleAcceptDeal(deal)}
+                    className="btn-primary"
+                    style={{ padding: '8px 16px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
+                  >
+                    Accepter <ArrowRight size={14} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{
+          marginTop: 14, padding: '10px 14px', borderRadius: 10,
+          background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.12)',
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontSize: 12, color: 'var(--text-muted)',
+        }}>
+          💡 <span>MANA prend <strong style={{ color: '#f59e0b' }}>11%</strong> de l'économie annuelle — <strong>vous gardez 89%</strong>. Aucun frais si aucune économie.</span>
         </div>
       </div>
 
