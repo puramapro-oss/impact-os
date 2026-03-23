@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import { ShieldCheck, FileSignature, CheckCircle } from 'lucide-react';
 import Modal from './Modal';
+import supabase from '../../lib/supabase';
 
 const COMMISSION_RATE = 0.11;
 
 async function saveMandate(data) {
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseKey) return null;
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: result, error } = await supabase.from('mandates').insert([data]).select();
     if (error) throw error;
     return result?.[0] ?? null;
