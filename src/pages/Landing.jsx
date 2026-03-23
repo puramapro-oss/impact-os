@@ -159,14 +159,12 @@ function FluxForm({ onClose }) {
     setSubmitting(true);
     await saveLead({
       situation: answers.situation ?? '',
-      abonnements: answers.abonnements ?? 8,
+      nb_abonnements: answers.abonnements ?? 8,
       categories: answers.categories ?? [],
       prenom: answers.prenom ?? '',
       nom: answers.nom ?? '',
       email: answers.email ?? '',
       tel: answers.tel ?? '',
-      savings_estimate: savings,
-      created_at: new Date().toISOString(),
     });
     setTimeout(() => { setSubmitting(false); setDone(true); }, 1600);
   };
