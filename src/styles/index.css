@@ -269,6 +269,10 @@ img {
   animation: fadeIn 0.3s ease;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   :root {
