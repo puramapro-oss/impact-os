@@ -1,13 +1,37 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Building2, ArrowRight, Eye, EyeOff, Check, Loader } from 'lucide-react';
+import { User, Mail, Lock, Building2, ArrowRight, Check, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+
+function Field({ label, name, type = 'text', icon, placeholder, value, error, onChange }) {
+  const Icon = icon;
+  const id = `register-${name}`;
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label htmlFor={id} style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>{label}</label>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', background: 'var(--bg-input)',
+        border: `1px solid ${error ? 'var(--accent-red)' : 'var(--border-color)'}`,
+        borderRadius: 'var(--border-radius-btn)',
+      }}>
+        <Icon size={16} color="var(--text-secondary)" />
+        <input
+          id={id} name={name} type={type} value={value} onChange={onChange}
+          aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}
+          placeholder={placeholder}
+          style={{ flex: 1, background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: 14 }}
+        />
+      </div>
+      {error && <span id={`${id}-error`} style={{ fontSize: 11, color: 'var(--accent-red)', marginTop: 4, display: 'block' }}>{error}</span>}
+    </div>
+  );
+}
 
 export default function Register() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [form, setForm] = useState({ prenom: '', nom: '', email: '', organisation: '', password: '', confirmPassword: '' });
-  const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -31,48 +55,43 @@ export default function Register() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
+    if (loading) return;
     setLoading(true);
-    const { error: authError } = await signUp(form.email, form.password, {
-      prenom: form.prenom,
-      nom: form.nom,
-      organisation: form.organisation,
-    });
-    setLoading(false);
-
-    if (authError) {
-      setErrors({ general: authError.message });
-    } else {
-      setSuccess(true);
+    try {
+      const { data, error } = await signUp(form.email.trim(), form.password, {
+        prenom: form.prenom.trim(),
+        nom: form.nom.trim(),
+        organisation: form.organisation.trim(),
+      });
+      if (error) {
+        setErrors({ general: error.message });
+      } else if (data?.session) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setErrors({ general: 'L’inscription a échoué. Vous pouvez réessayer.' });
+    } finally {
+      setLoading(false);
     }
   };
+
+  function bindField(name) {
+    return {
+      name, value: form[name], error: errors[name],
+      onChange(event) {
+        const value = event.currentTarget.value;
+        setForm(previous => ({ ...previous, [name]: value }));
+      },
+    };
+  }
 
   const pwdChecks = [
     { label: '8 caractères minimum', ok: form.password.length >= 8 },
     { label: 'Une majuscule', ok: /[A-Z]/.test(form.password) },
     { label: 'Un chiffre', ok: /\d/.test(form.password) },
   ];
-
-  const Field = ({ label, field, type = 'text', icon: Icon, placeholder }) => (
-    <div style={{ marginBottom: 14 }}>
-      <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>{label}</label>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 14px', background: 'var(--bg-input)',
-        border: `1px solid ${errors[field] ? 'var(--accent-red)' : 'var(--border-color)'}`,
-        borderRadius: 'var(--border-radius-btn)',
-      }}>
-        <Icon size={16} color="var(--text-secondary)" />
-        <input
-          type={field.includes('password') || field.includes('Password') ? (showPwd ? 'text' : 'password') : type}
-          value={form[field]}
-          onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-          placeholder={placeholder}
-          style={{ flex: 1, background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: 14 }}
-        />
-      </div>
-      {errors[field] && <span style={{ fontSize: 11, color: 'var(--accent-red)', marginTop: 4, display: 'block' }}>{errors[field]}</span>}
-    </div>
-  );
 
   if (success) {
     return (
@@ -123,7 +142,7 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="glass-card" style={{ padding: 28 }}>
           {errors.general && (
-            <div style={{
+            <div role="alert" style={{
               padding: '10px 14px', borderRadius: 8, marginBottom: 16,
               background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)',
               fontSize: 13, color: 'var(--accent-red)',
@@ -132,12 +151,12 @@ export default function Register() {
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Field label="Prénom" field="prenom" icon={User} placeholder="Sophie" />
-            <Field label="Nom" field="nom" icon={User} placeholder="Martin" />
+            <Field label="Prénom" {...bindField('prenom')} icon={User} placeholder="Sophie" />
+            <Field label="Nom" {...bindField('nom')} icon={User} placeholder="Martin" />
           </div>
-          <Field label="Email professionnel" field="email" type="email" icon={Mail} placeholder="sophie@association.fr" />
-          <Field label="Nom de l'organisation" field="organisation" icon={Building2} placeholder="Les Aigles de Lyon" />
-          <Field label="Mot de passe" field="password" icon={Lock} placeholder="Minimum 8 caractères" />
+          <Field label="Email professionnel" {...bindField('email')} type="email" icon={Mail} placeholder="sophie@association.fr" />
+          <Field label="Nom de l'organisation" {...bindField('organisation')} icon={Building2} placeholder="Les Aigles de Lyon" />
+          <Field label="Mot de passe" {...bindField('password')} type="password" icon={Lock} placeholder="Minimum 8 caractères" />
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
             {pwdChecks.map((c, i) => (
@@ -147,10 +166,10 @@ export default function Register() {
             ))}
           </div>
 
-          <Field label="Confirmer le mot de passe" field="confirmPassword" icon={Lock} placeholder="Confirmez votre mot de passe" />
+          <Field label="Confirmer le mot de passe" {...bindField('confirmPassword')} type="password" icon={Lock} placeholder="Confirmez votre mot de passe" />
 
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 20, cursor: 'pointer' }}>
-            <input type="checkbox" defaultChecked style={{ accentColor: '#f59e0b', marginTop: 2 }} />
+            <input type="checkbox" required style={{ accentColor: '#f59e0b', marginTop: 2 }} />
             <span>J'accepte les <span style={{ color: '#f59e0b' }}>Conditions Générales d'Utilisation</span> et la <span style={{ color: '#f59e0b' }}>Politique de Confidentialité</span></span>
           </label>
 
