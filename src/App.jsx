@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { ToastProvider } from './contexts/ToastContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeProvider';
+import { ToastProvider } from './contexts/ToastProvider';
+import { AuthProvider } from './contexts/AuthProvider';
 import AppLayout from './components/layout/AppLayout';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';

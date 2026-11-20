@@ -6,6 +6,20 @@ import {
 import { currentUser } from '../data/mockData';
 import { useToast } from '../contexts/ToastContext';
 
+const Toggle = ({ label, checked, onChange }) => (
+  <button type="button" role="switch" aria-label={label} aria-checked={checked} onClick={() => onChange(!checked)} style={{
+    width: 44, height: 24, borderRadius: 12, padding: 2,
+    background: checked ? 'var(--accent-green)' : 'var(--border-color)',
+    transition: 'background 0.2s ease', flexShrink: 0,
+  }}>
+    <div style={{
+      width: 20, height: 20, borderRadius: '50%', background: 'white',
+      transition: 'transform 0.2s ease',
+      transform: checked ? 'translateX(20px)' : 'translateX(0)',
+    }} />
+  </button>
+);
+
 export default function Parametres() {
   const { addToast } = useToast();
   const [tab, setTab] = useState('general');
@@ -41,20 +55,6 @@ export default function Parametres() {
   ];
 
   const handleSave = () => addToast('Paramètres enregistrés', 'success');
-
-  const Toggle = ({ checked, onChange }) => (
-    <button onClick={() => onChange(!checked)} style={{
-      width: 44, height: 24, borderRadius: 12, padding: 2,
-      background: checked ? 'var(--accent-green)' : 'var(--border-color)',
-      transition: 'background 0.2s ease', flexShrink: 0,
-    }}>
-      <div style={{
-        width: 20, height: 20, borderRadius: '50%', background: 'white',
-        transition: 'transform 0.2s ease',
-        transform: checked ? 'translateX(20px)' : 'translateX(0)',
-      }} />
-    </button>
-  );
 
   return (
     <div style={{ animation: 'fadeIn 0.4s ease' }}>
@@ -178,7 +178,7 @@ export default function Parametres() {
                       <div style={{ fontSize: 14, fontWeight: 600 }}>{label}</div>
                       <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{desc}</div>
                     </div>
-                    <Toggle checked={form[key]} onChange={(v) => { setForm({ ...form, [key]: v }); addToast(`${label} ${v ? 'activées' : 'désactivées'}`, 'info'); }} />
+                    <Toggle label={label} checked={form[key]} onChange={(v) => { setForm({ ...form, [key]: v }); addToast(`${label} ${v ? 'activées' : 'désactivées'}`, 'info'); }} />
                   </div>
                 ))}
               </div>
@@ -194,7 +194,7 @@ export default function Parametres() {
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Authentification 2FA</div>
                     <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Ajouter une couche de sécurité supplémentaire</div>
                   </div>
-                  <Toggle checked={form.auth2FA} onChange={(v) => { setForm({ ...form, auth2FA: v }); addToast(`2FA ${v ? 'activée' : 'désactivée'}`, v ? 'success' : 'warning'); }} />
+                  <Toggle label="Authentification 2FA" checked={form.auth2FA} onChange={(v) => { setForm({ ...form, auth2FA: v }); addToast(`2FA ${v ? 'activée' : 'désactivée'}`, v ? 'success' : 'warning'); }} />
                 </div>
                 <div>
                   <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>Timeout de session (minutes)</label>
