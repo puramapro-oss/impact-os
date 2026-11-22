@@ -153,7 +153,51 @@ const statsExpression = `(${JSON.stringify(expectedStats)}).map(expected => {
   return { label: expected.label, value: label?.previousElementSibling?.textContent.replace(/\\s/g, '') ?? null };
 })`;
 
+async function waitForFocusedControl(cdp, session) {
+  return evaluate(cdp, session, `new Promise(resolve => {
+    const started = performance.now(), deadlineMs = 2000, requiredStableMs = 100;
+    const focused = document.activeElement;
+    let previous = null, stableSince = null, firstState = null, current = null, samples = 0, frame;
+    let finished = false;
+    const read = () => {
+      const el = document.activeElement, style = getComputedStyle(el), box = el.getBoundingClientRect();
+      const x = Math.max(0, Math.min(innerWidth - 1, box.left + box.width / 2));
+      const y = Math.max(0, Math.min(innerHeight - 1, box.top + box.height / 2));
+      const top = document.elementFromPoint(x, y);
+      return { tag:el.tagName, text:(el.getAttribute('aria-label') || el.textContent).trim().slice(0,90),
+        sameFocusedControl:el === focused, focusVisible:el.matches(':focus-visible'), outline:style.outline,
+        hasOutline:!['none','hidden'].includes(style.outlineStyle) && parseFloat(style.outlineWidth)>0 && !['transparent','rgba(0, 0, 0, 0)'].includes(style.outlineColor),
+        inViewport:box.left>=-1 && box.right<=innerWidth+1 && box.top>=0 && box.bottom<=innerHeight+1,
+        uncovered:top===el || el.contains(top),
+        geometry:[box.left,box.top,box.right,box.bottom,scrollX,scrollY] };
+    };
+    const finish = timedOut => {
+      if (finished) return;
+      finished = true; clearTimeout(timer); cancelAnimationFrame(frame);
+      const now = performance.now();
+      resolve({...current, stable:stableSince!==null && now-stableSince>=requiredStableMs,
+        timedOut, elapsedMs:Math.round(now-started), deadlineMs, requiredStableMs, samples, firstState});
+    };
+    const sample = () => {
+      current = read(); samples++; firstState ??= current;
+      const now = performance.now();
+      const unchanged = previous && current.sameFocusedControl && current.geometry.every((coordinate,index) => Math.abs(coordinate-previous.geometry[index])<=0.25);
+      stableSince = unchanged ? (stableSince ?? now) : null;
+      const visible = current.tag!=='BODY' && current.focusVisible && current.hasOutline && current.inViewport && current.uncovered;
+      if (visible && stableSince!==null && now-stableSince>=requiredStableMs) { finish(false); return; }
+      previous = current;
+      frame = requestAnimationFrame(sample);
+    };
+    const timer = setTimeout(() => { current = read(); finish(true); }, deadlineMs);
+    frame = requestAnimationFrame(sample);
+  })`);
+}
+
 async function screenshot(cdp, session, name) {
+  await evaluate(cdp, session, 'window.scrollTo({top:0,left:0,behavior:"instant"})');
+  await evaluate(cdp, session, frames);
+  const scrollOrigin = await evaluate(cdp, session, '({x:scrollX,y:scrollY})');
+  assert.ok(Math.abs(scrollOrigin.x) <= 0.5 && Math.abs(scrollOrigin.y) <= 0.5, 'Full-page screenshots must start at the document origin');
   const metrics = await cdp.send('Page.getLayoutMetrics', {}, session);
   const height = Math.ceil(metrics.cssContentSize.height);
   assert.ok(height > 0 && height <= 24_000, `Unexpected screenshot height: ${height}`);
@@ -163,7 +207,7 @@ async function screenshot(cdp, session, name) {
   }, session);
   const bytes = Buffer.from(data, 'base64');
   await writeFile(join(output, name), bytes);
-  return { file: name, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
+  return { file: name, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), scrollOrigin };
 }
 
 async function scenario(cdp, base, width, reduced, theme = 'dark') {
@@ -245,6 +289,35 @@ async function scenario(cdp, base, width, reduced, theme = 'dark') {
       check(result, 'normal-counters-reach-target', true, await evaluate(cdp, session, statsExpression));
     }
 
+    const statText = await evaluate(cdp, session, `(() => {
+      const rectData = rect => ({left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,width:rect.width,height:rect.height});
+      const inside = (inner,outer) => inner.left>=outer.left-0.5 && inner.right<=outer.right+0.5 && inner.top>=outer.top-0.5 && inner.bottom<=outer.bottom+0.5;
+      const counters = [...document.querySelectorAll('.landing-stat')].map(cell => {
+        const value = cell.querySelector('.landing-stat-value') || cell.firstElementChild;
+        const range = document.createRange(); range.selectNodeContents(value);
+        const textBounds = rectData(range.getBoundingClientRect());
+        const valueBox = rectData(value.getBoundingClientRect()), cellBox = rectData(cell.getBoundingClientRect());
+        const fragments = [], walker = document.createTreeWalker(value, NodeFilter.SHOW_TEXT);
+        for (let node; (node = walker.nextNode());) {
+          if (!node.textContent.trim()) continue;
+          const textRange = document.createRange(); textRange.selectNodeContents(node);
+          fragments.push(...[...textRange.getClientRects()].filter(rect => rect.width>0 && rect.height>0).map(rectData));
+        }
+        return {label:cell.lastElementChild.textContent.trim(),value:value.textContent.replace(/\\s/g,''),
+          textBounds,valueBox,cellBox,fragments,font:getComputedStyle(value).font,
+          fullyContained:fragments.length>0 && textBounds.width>0 && textBounds.height>0 && inside(textBounds,valueBox) && inside(textBounds,cellBox) && fragments.every(rect => inside(rect,valueBox) && inside(rect,cellBox))};
+      });
+      const overlaps = [];
+      for (let left=0;left<counters.length;left++) for (let right=left+1;right<counters.length;right++) {
+        const a=counters[left].textBounds,b=counters[right].textBounds;
+        if (Math.min(a.right,b.right)-Math.max(a.left,b.left)>0.5 && Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>0.5)
+          overlaps.push([counters[left].label,counters[right].label]);
+      }
+      return {counters,overlaps,toleranceCssPx:0.5};
+    })()`);
+    check(result, 'counter-text-fits-without-clipping-or-overlap',
+      statText.counters.length === expectedStats.length && statText.counters.every((counter,index) => counter.fullyContained && counter.label === expectedStats[index].label && counter.value === expectedStats[index].value) && statText.overlaps.length === 0, statText);
+
     const layout = await evaluate(cdp, session, `(() => {
       const width = document.documentElement.clientWidth;
       const overflow = [...document.querySelectorAll('body *')].flatMap(el => {
@@ -265,20 +338,9 @@ async function scenario(cdp, base, width, reduced, theme = 'dark') {
     for (let index = 0; index < 12; index++) {
       await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9, nativeVirtualKeyCode: 9 }, session);
       await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9, nativeVirtualKeyCode: 9 }, session);
-      await evaluate(cdp, session, frames);
-      focusChecks.push(await evaluate(cdp, session, `(() => {
-        const el = document.activeElement; const style = getComputedStyle(el); const box = el.getBoundingClientRect();
-        const x = Math.max(0, Math.min(innerWidth - 1, box.left + box.width / 2));
-        const y = Math.max(0, Math.min(innerHeight - 1, box.top + box.height / 2));
-        const top = document.elementFromPoint(x, y);
-        const hasOutline = !['none','hidden'].includes(style.outlineStyle) && parseFloat(style.outlineWidth) > 0 && !['transparent','rgba(0, 0, 0, 0)'].includes(style.outlineColor);
-        return { tag: el.tagName, text: (el.getAttribute('aria-label') || el.textContent).trim().slice(0, 90),
-          focusVisible: el.matches(':focus-visible'), outline: style.outline, hasOutline,
-          inViewport: box.left >= -1 && box.right <= innerWidth + 1 && box.top >= 0 && box.bottom <= innerHeight + 1,
-          uncovered: top === el || el.contains(top) };
-      })()`));
+      focusChecks.push(await waitForFocusedControl(cdp, session));
     }
-    check(result, 'keyboard-visible-focus-first-12-stops', focusChecks.every(f => f.tag !== 'BODY' && f.focusVisible && f.hasOutline && f.inViewport && f.uncovered), focusChecks);
+    check(result, 'keyboard-visible-focus-first-12-stops', focusChecks.every(f => !f.timedOut && f.stable && f.sameFocusedControl && f.tag !== 'BODY' && f.focusVisible && f.hasOutline && f.inViewport && f.uncovered), focusChecks);
 
     // Exercise the actual native buttons and React state with real browser input.
     const menuVisible = await evaluate(cdp, session, "!!document.querySelector('.landing-menu-toggle')?.getClientRects().length");

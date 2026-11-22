@@ -296,6 +296,7 @@ img {
 .landing-page section[id] { scroll-margin-top: 88px; }
 .landing-hero-actions { flex-wrap: wrap; justify-content: center; }
 .landing-stats { width: 100%; }
+.landing-stat-value { font-size: clamp(32px, 3.3vw, 48px) !important; white-space: nowrap; }
 .landing-menu-toggle { display: none; }
 [data-theme="light"] .landing-navigation { background: var(--bg-card) !important; }
 .landing-page .glass-card { overflow-wrap: anywhere; }
@@ -321,10 +322,13 @@ img {
   .landing-grid-three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 700px) {
+  .landing-stats { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; }
+  .landing-stat-value { font-size: 40px !important; }
+}
+
 @media (max-width: 560px) {
   .landing-grid-three, .landing-grid-four { grid-template-columns: minmax(0, 1fr); }
-  .landing-stats { gap: 12px !important; }
-  .landing-stat > div:first-child { font-size: 32px !important; }
   .landing-stat > div:last-child { font-size: 12px !important; }
   .landing-hero-actions { width: 100%; }
   .landing-hero-actions > button { width: 100%; justify-content: center; }
@@ -333,4 +337,12 @@ img {
 
 @media (prefers-reduced-motion: reduce) {
   .btn-primary:hover, .landing-hover-card { transform: none !important; }
+}
+
+[data-theme="light"] .landing-stat-value,
+[data-theme="light"] .landing-wordmark,
+[data-theme="light"] .landing-highlight {
+  background: none !important;
+  -webkit-text-fill-color: #92400e;
+  color: #92400e;
 }

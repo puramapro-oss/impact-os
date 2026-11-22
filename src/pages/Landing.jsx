@@ -11,7 +11,7 @@ function AnimatedStat({ value, suffix, label }) {
   const { count, ref } = useAnimatedCounter(value);
   return (
     <div ref={ref} className="landing-stat" style={{ textAlign: 'center' }}>
-      <div style={{
+      <div className="landing-stat-value" style={{
         fontSize: 48, fontWeight: 800, fontFamily: 'var(--font-heading)',
         background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
         WebkitBackgroundClip: 'text',
@@ -141,7 +141,7 @@ export default function Landing() {
               fontSize: 18,
               boxShadow: '0 0 12px rgba(245, 158, 11, 0.3)',
             }}>✨</div>
-            <span style={{
+            <span className="landing-wordmark" style={{
               fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: 20,
               background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
               WebkitBackgroundClip: 'text',
@@ -201,7 +201,7 @@ export default function Landing() {
           lineHeight: 1.1, maxWidth: 800, marginBottom: 24,
         }}>
           LUMIOS illumine{' '}
-          <span style={{
+          <span className="landing-highlight" style={{
             background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -223,7 +223,7 @@ export default function Landing() {
         </div>
         <div className="landing-stats" style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 48,
-          maxWidth: 700,
+          maxWidth: 1000,
         }}>
           <AnimatedStat value={2400} suffix="+" label="Organisations actives" />
           <AnimatedStat value={98} suffix="%" label="Taux de satisfaction" />
@@ -286,8 +286,8 @@ export default function Landing() {
               onClick={() => navigate('/register')}
               >
                 <Icon size={28} color="#f59e0b" style={{ marginBottom: 12 }} />
-                <span style={{ display: 'block', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{p.title}</span>
-                <span style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)' }}>{p.desc}</span>
+                <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, lineHeight: 1.2, marginBottom: 6 }}>{p.title}</span>
+                <span style={{ display: 'block', fontSize: 12, lineHeight: 1.6, color: 'var(--text-secondary)' }}>{p.desc}</span>
               </button>
             );
           })}
@@ -472,7 +472,7 @@ export default function Landing() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 14,
               }}>✨</div>
-              <span style={{
+              <span className="landing-wordmark" style={{
                 fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: 16,
                 background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
                 WebkitBackgroundClip: 'text',
