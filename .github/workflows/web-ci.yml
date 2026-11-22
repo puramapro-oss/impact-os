@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24.22.3'
-      - name: Install the unchanged lock without automatic audit or lifecycle scripts
+      - name: Install the reviewed lock without automatic audit or lifecycle scripts
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run authentication and form regressions with mocked providers
         run: npm test -- --maxWorkers=2
