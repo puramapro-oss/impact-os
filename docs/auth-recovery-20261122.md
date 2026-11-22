@@ -53,3 +53,13 @@ Sources officielles : [avis Vite](https://github.com/vitejs/vite/security/adviso
 ## Limites restantes
 
 Le lot ne transforme pas les écrans utilisant `mockData` en services de production et n’ajoute pas de fonctionnalité non spécifiée. La sécurisation complète des dépendances, les parcours dans un navigateur réel, la création de comptes, les politiques effectives de base de données, les services externes et le déploiement restent à qualifier. Les réussites locales ne prouvent ni une mise en production ni la fin de tout le projet.
+
+## Reprise du 22 novembre — inscription
+
+La reprise part de la tête PR2 `670c005a4028ff7bffd12c19e4504d7340310bc1`, arbre `a330c5c98f35aab6b079653810487c03dbd6f0fc`. Les 48 fichiers ont été vérifiés contre leurs blobs Git, y compris le binaire conservé. Elle prolonge la PR existante.
+
+Trois défauts supplémentaires sont corrigés dans `Register` : double appel à `signUp` avant le prochain rendu React, redirection tardive après navigation ou remontage du formulaire, et adresse de confirmation remplacée par une saisie effectuée après l’envoi. La garde de soumission est synchrone, les réponses d’un formulaire démonté sont ignorées, et la confirmation conserve l’adresse réellement transmise.
+
+Avant correction, les 9 premiers nouveaux scénarios produisaient 4 échecs ; un dixième scénario a ensuite reproduit séparément l’adresse de confirmation incorrecte. Après correction : **34/34 tests PASS**, sans saut (24 préexistants et 10 nouveaux), **lint global PASS** sans erreur ni avertissement et **build Vite PASS**, 2 361 modules. Les valeurs de mot de passe et les contrats Supabase sont conservés. Le contrôle du patch et sa contre-revue indépendante ont réussi.
+
+Les tests exécutent les composants React et les événements DOM sous jsdom ; ils ne créent aucun compte réel. Les dépendances, les règles ESLint, les workflows, la configuration Vercel et les autres écrans sont inchangés. L’avertissement de taille du paquet principal et les limites de sécurité des dépendances décrites plus haut restent ouverts. La réussite distante de cette nouvelle tête doit être vérifiée séparément de celle des 24 tests antérieurs.
