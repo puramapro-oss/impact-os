@@ -33,8 +33,6 @@ export default function Parametres() {
     notifPush: true,
     notifSMS: false,
     notifResume: true,
-    auth2FA: true,
-    sessionTimeout: '30',
     ipWhitelist: false,
   });
 
@@ -188,29 +186,31 @@ export default function Parametres() {
           {tab === 'securite' && (
             <div>
               <h3 style={{ fontSize: 18, marginBottom: 20 }}>Sécurité</h3>
+              <p id="security-unavailable" style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                Ces réglages ne sont pas reliés au compte dans cette démonstration. L’état de la 2FA et la durée de session ne sont pas vérifiés. Aucun mot de passe n’est modifié depuis cet écran.
+              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Authentification 2FA</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Ajouter une couche de sécurité supplémentaire</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>État du compte non vérifié</div>
                   </div>
-                  <Toggle label="Authentification 2FA" checked={form.auth2FA} onChange={(v) => { setForm({ ...form, auth2FA: v }); addToast(`2FA ${v ? 'activée' : 'désactivée'}`, v ? 'success' : 'warning'); }} />
+                  <button type="button" disabled aria-label="Authentification 2FA" aria-describedby="security-unavailable" className="btn-secondary">
+                    Configuration indisponible
+                  </button>
                 </div>
                 <div>
-                  <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>Timeout de session (minutes)</label>
-                  <select value={form.sessionTimeout} onChange={(e) => setForm({ ...form, sessionTimeout: e.target.value })}
+                  <label htmlFor="security-session-timeout" style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>Durée de session</label>
+                  <select id="security-session-timeout" disabled aria-describedby="security-unavailable" defaultValue=""
                     style={{
                       width: 200, padding: '10px 14px', background: 'var(--bg-input)',
                       border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-btn)',
                       color: 'var(--text-primary)', fontSize: 14,
                     }}>
-                    <option value="15">15 minutes</option>
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 heure</option>
-                    <option value="480">8 heures</option>
+                    <option value="">Non vérifiée</option>
                   </select>
                 </div>
-                <button onClick={() => addToast('Mot de passe modifié', 'success')} className="btn-secondary">Changer le mot de passe</button>
+                <button type="button" disabled aria-describedby="security-unavailable" className="btn-secondary">Changer le mot de passe</button>
               </div>
             </div>
           )}

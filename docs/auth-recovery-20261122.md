@@ -147,3 +147,15 @@ La suite comporte **53 tests** : les 34 tests existants conservés et 19 nouveau
 Commandes de recette : `npm test`, `npm run lint`, `npm run build -- --manifest`, puis `git diff --check`. Une première tentative s’est arrêtée avant le démarrage des tests faute d’espace disque ; elle est conservée comme incident d’environnement et ne compte pas comme une exécution de la suite. La recette a ensuite été rejouée.
 
 Les fichiers publiés sont appliqués sur l’arbre distant existant avec un contrôle de tête attendue. La CI doit être relue sur le nouveau commit ; aucun déploiement de production, navigateur natif, fournisseur réel ou remplacement des données de démonstration n’est inclus dans cette validation.
+
+## Reprise du 22 novembre — réglages de sécurité non raccordés
+
+Ce complément reprend la tête PR2 `3481f9ca7f429946ddd2208f98851d2205de66fd`, qui conserve les corrections d’authentification, d’inscription, de dépendances et de chargement des routes. Les écrans et routes de démonstration restent accessibles selon leur contrat existant.
+
+La lecture de `Parametres.jsx` établit trois indications trompeuses : un interrupteur initialisé à « 2FA active » sans lecture du compte, des confirmations d’activation ou de désactivation ne modifiant qu’un état React, et un bouton annonçant « Mot de passe modifié » sans opération de compte. Le sélecteur de durée de session n’appliquait pas non plus son réglage. Aucun effet réel de sécurité ne peut être déduit de ces interactions.
+
+L’onglet explique maintenant cette limite. La 2FA et la durée de session sont présentées comme non vérifiées ; leurs commandes et le changement de mot de passe sont indisponibles tant qu’un parcours réel n’est pas raccordé. Aucun nouveau mot de passe n’est demandé dans cet écran et aucun succès fictif n’est émis. Les autres réglages et les appels Supabase existants de connexion et d’inscription sont conservés.
+
+La régression ajoutée dans la suite `test/forms.test.jsx` exerce les clics de l’utilisateur, vérifie l’absence de confirmation de sécurité, puis le retour à l’onglet après navigation. Elle réutilise React/DOM et les frontières de contexte déjà simulées. Le défaut a été établi par lecture du code ; aucune exécution locale de ce complément n’a été possible. La recette du commit publié doit être lue dans la CI de la PR, avec le test, le lint et le build existants.
+
+**Limite fonctionnelle :** l’administration réelle du mot de passe, de la MFA et de la durée de session demeure non implémentée dans cet écran de démonstration. Cette correction ne prouve aucun changement de configuration Supabase, de compte réel ou de production. Aucun audit externe de dépendances n’est relancé.
