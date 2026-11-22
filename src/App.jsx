@@ -1,21 +1,24 @@
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeProvider';
 import { ToastProvider } from './contexts/ToastProvider';
 import { AuthProvider } from './contexts/AuthProvider';
 import AppLayout from './components/layout/AppLayout';
+import RouteContent from './components/ui/RouteContent';
 import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import Resoutre from './pages/Resoutre';
-import Inbox from './pages/Inbox';
-import Agent from './pages/Agent';
-import Impact from './pages/Impact';
-import Membres from './pages/Membres';
-import Documents from './pages/Documents';
-import Audit from './pages/Audit';
-import Parametres from './pages/Parametres';
-import Profil from './pages/Profil';
-import Login from './pages/Login';
-import Register from './pages/Register';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Resoutre = lazy(() => import('./pages/Resoutre'));
+const Inbox = lazy(() => import('./pages/Inbox'));
+const Agent = lazy(() => import('./pages/Agent'));
+const Impact = lazy(() => import('./pages/Impact'));
+const Membres = lazy(() => import('./pages/Membres'));
+const Documents = lazy(() => import('./pages/Documents'));
+const Audit = lazy(() => import('./pages/Audit'));
+const Parametres = lazy(() => import('./pages/Parametres'));
+const Profil = lazy(() => import('./pages/Profil'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 
 export default function App() {
   return (
@@ -26,8 +29,8 @@ export default function App() {
             <Routes>
               {/* Public pages */}
               <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<RouteContent><Login /></RouteContent>} />
+              <Route path="/register" element={<RouteContent><Register /></RouteContent>} />
 
               {/* App pages with layout */}
               <Route element={<AppLayout />}>

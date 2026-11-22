@@ -1,0 +1,7 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "fix/impact-os-auth-security-20261122": false
+    }
+  }
+}

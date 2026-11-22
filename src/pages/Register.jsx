@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Building2, ArrowRight, Check, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,7 +34,14 @@ export default function Register() {
   const [form, setForm] = useState({ prenom: '', nom: '', email: '', organisation: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState('');
+  const submitting = useRef(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
 
   const validate = () => {
     const e = {};
@@ -51,29 +58,33 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting.current) return;
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    if (loading) return;
+    submitting.current = true;
     setLoading(true);
     try {
-      const { data, error } = await signUp(form.email.trim(), form.password, {
+      const registrationEmail = form.email.trim();
+      const { data, error } = await signUp(registrationEmail, form.password, {
         prenom: form.prenom.trim(),
         nom: form.nom.trim(),
         organisation: form.organisation.trim(),
       });
+      if (!mounted.current) return;
       if (error) {
         setErrors({ general: error.message });
       } else if (data?.session) {
         navigate('/dashboard', { replace: true });
       } else {
-        setSuccess(true);
+        setConfirmationEmail(registrationEmail);
       }
     } catch {
-      setErrors({ general: 'L’inscription a échoué. Vous pouvez réessayer.' });
+      if (mounted.current) setErrors({ general: 'L’inscription a échoué. Vous pouvez réessayer.' });
     } finally {
-      setLoading(false);
+      submitting.current = false;
+      if (mounted.current) setLoading(false);
     }
   };
 
@@ -93,7 +104,7 @@ export default function Register() {
     { label: 'Un chiffre', ok: /\d/.test(form.password) },
   ];
 
-  if (success) {
+  if (confirmationEmail) {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -109,7 +120,7 @@ export default function Register() {
           </div>
           <h1 style={{ fontSize: 28, marginBottom: 12, fontFamily: 'var(--font-heading)' }}>Compte créé !</h1>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.7 }}>
-            Un email de confirmation a été envoyé à <strong style={{ color: 'var(--text-primary)' }}>{form.email}</strong>.
+            Un email de confirmation a été envoyé à <strong style={{ color: 'var(--text-primary)' }}>{confirmationEmail}</strong>.
             Vérifiez votre boîte de réception pour activer votre compte LUMIOS.
           </p>
           <button onClick={() => navigate('/login')} className="btn-primary" style={{ padding: '12px 32px', fontSize: 15 }}>

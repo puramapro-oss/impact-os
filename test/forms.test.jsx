@@ -120,3 +120,37 @@ test('l’interrupteur de notifications garde le focus et expose son état', () 
   act(() => control.click());
   expect(control.getAttribute('aria-checked')).toBe('true');
 });
+
+test('les réglages de sécurité non raccordés ne confirment aucun changement du compte', () => {
+  show(<Parametres />);
+  const findButton = (text) => [...container.querySelectorAll('button')].find(button => button.textContent.trim() === text);
+  act(() => findButton('Sécurité').click());
+
+  const password = findButton('Changer le mot de passe');
+  const twoFactor = container.querySelector('[aria-label="Authentification 2FA"]');
+  act(() => {
+    password.click();
+    twoFactor.click();
+  });
+  act(() => twoFactor.click());
+  expect(addToast).not.toHaveBeenCalled();
+
+  expect(password.disabled).toBe(true);
+  expect(twoFactor.disabled).toBe(true);
+  expect(twoFactor.hasAttribute('aria-checked')).toBe(false);
+  expect(container.querySelector('input[type="password"]')).toBeNull();
+  const notice = document.getElementById(password.getAttribute('aria-describedby'));
+  expect(notice.textContent).toMatch(/ne sont pas reliés au compte/i);
+  expect(notice.textContent).toMatch(/Aucun mot de passe n’est modifié/i);
+  expect(container.textContent).toContain('État du compte non vérifié');
+  const duration = container.querySelector('select');
+  expect(duration.disabled).toBe(true);
+  expect(duration.value).toBe('');
+  expect(duration.selectedOptions[0].textContent).toBe('Non vérifiée');
+
+  act(() => findButton('Notifications').click());
+  act(() => findButton('Sécurité').click());
+  expect(container.querySelector('select').value).toBe('');
+  expect(container.querySelector('[role="switch"]')).toBeNull();
+  expect(addToast).not.toHaveBeenCalled();
+});

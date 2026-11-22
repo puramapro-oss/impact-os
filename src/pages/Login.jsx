@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,23 +11,38 @@ export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting.current) return;
     if (!email.trim()) { setError('Veuillez saisir votre email'); return; }
     if (!password.trim()) { setError('Veuillez saisir votre mot de passe'); return; }
+    submitting.current = true;
     setError('');
     setLoading(true);
 
-    const { error: authError } = await signIn(email, password);
-    setLoading(false);
-
-    if (authError) {
-      setError(authError.message === 'Invalid login credentials'
-        ? 'Email ou mot de passe incorrect'
-        : authError.message);
-    } else {
-      navigate('/dashboard');
+    try {
+      const { error: authError } = await signIn(email.trim(), password);
+      if (!mounted.current) return;
+      if (authError) {
+        setError(authError.message === 'Invalid login credentials'
+          ? 'Email ou mot de passe incorrect'
+          : authError.message);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch {
+      if (mounted.current) setError('La connexion a échoué. Vous pouvez réessayer.');
+    } finally {
+      submitting.current = false;
+      if (mounted.current) setLoading(false);
     }
   };
 
@@ -53,7 +68,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="glass-card" style={{ padding: 28 }}>
           {error && (
-            <div style={{
+            <div role="alert" style={{
               padding: '10px 14px', borderRadius: 8, marginBottom: 16,
               background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)',
               fontSize: 13, color: 'var(--accent-red)',

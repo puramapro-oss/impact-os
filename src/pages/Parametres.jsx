@@ -1,3 +1,4 @@
+import AccountSecurity from '../components/security/AccountSecurity';
 import { useState } from 'react';
 import {
   Settings, Building2, Bell, Shield, Users, CreditCard,
@@ -33,8 +34,6 @@ export default function Parametres() {
     notifPush: true,
     notifSMS: false,
     notifResume: true,
-    auth2FA: true,
-    sessionTimeout: '30',
     ipWhitelist: false,
   });
 
@@ -185,35 +184,7 @@ export default function Parametres() {
             </div>
           )}
 
-          {tab === 'securite' && (
-            <div>
-              <h3 style={{ fontSize: 18, marginBottom: 20 }}>Sécurité</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>Authentification 2FA</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Ajouter une couche de sécurité supplémentaire</div>
-                  </div>
-                  <Toggle label="Authentification 2FA" checked={form.auth2FA} onChange={(v) => { setForm({ ...form, auth2FA: v }); addToast(`2FA ${v ? 'activée' : 'désactivée'}`, v ? 'success' : 'warning'); }} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>Timeout de session (minutes)</label>
-                  <select value={form.sessionTimeout} onChange={(e) => setForm({ ...form, sessionTimeout: e.target.value })}
-                    style={{
-                      width: 200, padding: '10px 14px', background: 'var(--bg-input)',
-                      border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-btn)',
-                      color: 'var(--text-primary)', fontSize: 14,
-                    }}>
-                    <option value="15">15 minutes</option>
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 heure</option>
-                    <option value="480">8 heures</option>
-                  </select>
-                </div>
-                <button onClick={() => addToast('Mot de passe modifié', 'success')} className="btn-secondary">Changer le mot de passe</button>
-              </div>
-            </div>
-          )}
+          {tab === 'securite' && <AccountSecurity />}
 
           {tab === 'membres' && (
             <div>

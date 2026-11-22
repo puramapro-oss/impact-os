@@ -1,3 +1,4 @@
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useState } from 'react';
 import {
   BarChart3, Euro, FileText, TrendingUp, Target,
@@ -43,6 +44,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Impact() {
+  const reducedMotion = useReducedMotion();
   const { addToast } = useToast();
   const [tab, setTab] = useState('impact');
 
@@ -123,7 +125,7 @@ export default function Impact() {
                   <XAxis dataKey="mois" stroke="var(--text-secondary)" fontSize={12} />
                   <YAxis stroke="var(--text-secondary)" fontSize={12} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="impact" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5 }} name="Score impact" />
+                  <Line isAnimationActive={!reducedMotion} type="monotone" dataKey="impact" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5 }} name="Score impact" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -131,7 +133,7 @@ export default function Impact() {
               <h3 style={{ fontSize: 16, marginBottom: 16 }}>Répartition</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
+                  <Pie isAnimationActive={!reducedMotion} data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />

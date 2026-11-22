@@ -270,3 +270,81 @@ img {
     --sidebar-width: 0px;
   }
 }
+
+/* Keep keyboard location visible in both themes, including inline controls. */
+:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 3px;
+}
+
+/* Keep the final visual state without decorative movement or delayed entry. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* Retain the existing landing design while allowing cards and controls to fit. */
+.landing-page { --text-muted: var(--text-secondary); --landing-accent-ink: #f59e0b; }
+[data-theme="light"] .landing-page { --landing-accent-ink: #92400e; }
+.landing-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.landing-grid-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.landing-page main, .landing-page section, .landing-page .glass-card { min-width: 0; }
+.landing-page section[id] { scroll-margin-top: 88px; }
+.landing-hero-actions { flex-wrap: wrap; justify-content: center; }
+.landing-stats { width: 100%; }
+.landing-stat-value { font-size: clamp(32px, 3.3vw, 48px) !important; white-space: nowrap; }
+.landing-menu-toggle { display: none; }
+[data-theme="light"] .landing-navigation { background: var(--bg-card) !important; }
+.landing-page .glass-card { overflow-wrap: anywhere; }
+#faq button:focus-visible { outline-offset: -4px; }
+
+@media (max-width: 1000px) {
+  .landing-grid-four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing-pricing > .glass-card { transform: none !important; }
+}
+
+@media (max-width: 900px) {
+  .landing-menu-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; background: transparent; color: var(--text-primary);
+    border: 1px solid var(--border-color); border-radius: var(--border-radius-btn);
+  }
+  .landing-navigation-actions {
+    display: none !important; position: absolute; top: 64px; left: 0; right: 0;
+    flex-wrap: wrap; justify-content: center; padding: 20px 24px; gap: 16px !important;
+    background: var(--bg-card); border-bottom: 1px solid var(--border-color);
+  }
+  .landing-navigation-actions[data-open="true"] { display: flex !important; }
+  .landing-grid-three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .landing-stats { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; }
+  .landing-stat-value { font-size: 40px !important; }
+}
+
+@media (max-width: 560px) {
+  .landing-grid-three, .landing-grid-four { grid-template-columns: minmax(0, 1fr); }
+  .landing-stat > div:last-child { font-size: 12px !important; }
+  .landing-hero-actions { width: 100%; }
+  .landing-hero-actions > button { width: 100%; justify-content: center; }
+  .landing-page h2 { font-size: 28px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary:hover, .landing-hover-card { transform: none !important; }
+}
+
+[data-theme="light"] .landing-stat-value,
+[data-theme="light"] .landing-wordmark,
+[data-theme="light"] .landing-highlight {
+  background: none !important;
+  -webkit-text-fill-color: #92400e !important;
+  color: #92400e !important;
+}
