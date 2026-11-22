@@ -62,6 +62,24 @@ test('une absence de session termine le chargement', async () => {
   expect(container.textContent).toBe('signed-out');
 });
 
+test('le getter de session est actualisé dans le callback avant le prochain rendu', async () => {
+  show();
+  const initial = session('account-a');
+  await finish(0, { data: { session: initial }, error: null });
+  const getter = context.getCurrentSession;
+  const next = session('account-b');
+  act(() => {
+    subscriptions.at(-1).callback('SIGNED_IN', next);
+    expect(context.session).toBe(initial);
+    expect(getter()).toBe(next);
+  });
+  expect(context.getCurrentSession).toBe(getter);
+  act(() => {
+    subscriptions.at(-1).callback('SIGNED_OUT', null);
+    expect(getter()).toBeNull();
+  });
+});
+
 test.each(['SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED'])('%s récent prévaut sur une lecture initiale tardive', async event => {
   show();
   const recent = session('recent');

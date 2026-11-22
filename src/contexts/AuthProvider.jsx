@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
 import { AuthContext } from './AuthContext.js';
@@ -7,6 +7,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const currentSession = useRef(null);
+  const getCurrentSession = useCallback(() => currentSession.current, []);
 
   useEffect(() => {
     let active = true;
@@ -14,6 +16,7 @@ export function AuthProvider({ children }) {
 
     const applySession = nextSession => {
       if (!active) return;
+      currentSession.current = nextSession;
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
       setLoading(false);
@@ -37,6 +40,7 @@ export function AuthProvider({ children }) {
 
     return () => {
       active = false;
+      currentSession.current = null;
       subscription.unsubscribe();
     };
   }, []);
@@ -64,7 +68,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, getCurrentSession }}>
       {children}
     </AuthContext.Provider>
   );

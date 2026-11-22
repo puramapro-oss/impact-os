@@ -1,3 +1,4 @@
+import AccountSecurity from '../components/security/AccountSecurity';
 import { useState } from 'react';
 import {
   Settings, Building2, Bell, Shield, Users, CreditCard,
@@ -183,37 +184,7 @@ export default function Parametres() {
             </div>
           )}
 
-          {tab === 'securite' && (
-            <div>
-              <h3 style={{ fontSize: 18, marginBottom: 20 }}>Sécurité</h3>
-              <p id="security-unavailable" style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
-                Ces réglages ne sont pas reliés au compte dans cette démonstration. L’état de la 2FA et la durée de session ne sont pas vérifiés. Aucun mot de passe n’est modifié depuis cet écran.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>Authentification 2FA</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>État du compte non vérifié</div>
-                  </div>
-                  <button type="button" disabled aria-label="Authentification 2FA" aria-describedby="security-unavailable" className="btn-secondary">
-                    Configuration indisponible
-                  </button>
-                </div>
-                <div>
-                  <label htmlFor="security-session-timeout" style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>Durée de session</label>
-                  <select id="security-session-timeout" disabled aria-describedby="security-unavailable" defaultValue=""
-                    style={{
-                      width: 200, padding: '10px 14px', background: 'var(--bg-input)',
-                      border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-btn)',
-                      color: 'var(--text-primary)', fontSize: 14,
-                    }}>
-                    <option value="">Non vérifiée</option>
-                  </select>
-                </div>
-                <button type="button" disabled aria-describedby="security-unavailable" className="btn-secondary">Changer le mot de passe</button>
-              </div>
-            </div>
-          )}
+          {tab === 'securite' && <AccountSecurity />}
 
           {tab === 'membres' && (
             <div>
