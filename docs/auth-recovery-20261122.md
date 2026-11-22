@@ -117,3 +117,33 @@ Les tests exécutent les composants React et les événements DOM sous jsdom ; i
 La tête distante a évolué pendant la recette vers `271e9c54d4d9e5dac59719bc506f535c4584ad6c`. Les deux fichiers inscription de cette tête ont été récupérés et vérifiés par leur SHA Git, et sa note historique a été conservée. La nouvelle publication part de cette tête, conserve ses corrections et ne remplace que les quatre fichiers du lot dépendances.
 
 Sur ce candidat composé : **34/34 tests PASS**, lint global sortie 0 et build Vite 8.3.8 sortie 0, à 17 h 11 UTC le 22 novembre. L’installation verrouillée et la comparaison locale des 51 plages d’avis restent celles du lot dépendances ci-dessus : 14 paquets touchés avant, zéro après pour ce corpus daté. Aucun nouvel audit externe ni validation fournisseur réel. Le déploiement automatique de la branche reste désactivé.
+
+## Reprise du 22 novembre — chargement des pages et récupération
+
+Ce complément part de la tête PR2 `978097d2f64fa978672707ba6f111937e43a5d35`, arbre `6db41200433cb2d996e433de30d84960d98b1ace`. Il conserve intégralement les corrections de dépendances et d’inscription publiées pendant la recette. Notre autre variante d’inscription et notre verrou intermédiaire sont écartés pour éviter les doublons. Les 48 blobs texte présents correspondent à cette tête ; le binaire distant non importé reste conservé dans l’arbre de publication.
+
+### Comportement
+
+Douze pages sont chargées à la demande. L’accueil, la structure de navigation et les providers demeurent disponibles pendant leur chargement. Une navigation entre pages conserve le panneau replié et l’abonnement d’authentification. Un statut de chargement est annoncé poliment ; un échec d’import ou de rendu affiche des actions explicites de rechargement et de retour à l’accueil, sans boucle de rechargement automatique. Une nouvelle route réinitialise la frontière d’erreur.
+
+Les actions de récupération reprennent les boutons existants. Une règle de focus visible ciblée rétablit leur repérage au clavier malgré la suppression globale historique des contours de boutons. Cette correction est issue d’une contre-revue indépendante.
+
+### Preuve de réduction du chargement initial
+
+Comparaison avec les mêmes dépendances verrouillées et les mêmes valeurs synthétiques de fournisseur. Le calcul suit la fermeture des imports statiques du manifeste Vite ; il ne se limite pas arbitrairement à un fichier principal. Compression gzip Python, niveau 9 et date neutralisée.
+
+| Mesure | Avant | Après | Réduction |
+| --- | ---: | ---: | ---: |
+| JavaScript initial, octets | 943 533 | 478 387 | 49,298 % |
+| JavaScript initial gzip, octets | 262 891 | 139 183 | 47,057 % |
+| Pages en import dynamique | 0 | 12 | — |
+
+Le build Vite 8.3.8 transforme 2 363 modules ; aucun chunk ne dépasse le seuil de 500 kB. Le seuil n’a pas été relevé. Le volume initial diminue ; aucune mesure de latence réseau, de temps interactif sur appareil ou de Core Web Vitals n’est revendiquée.
+
+### Contrôles et limites
+
+La suite comporte **53 tests** : les 34 tests existants conservés et 19 nouveaux cas de navigation et de récupération. Ces nouveaux cas couvrent les 13 entrées réelles, la stabilité de la navigation et des providers, l’historique, la route inconnue, un chargement différé et un échec récupérable. Ils utilisent React/DOM avec jsdom ; le fournisseur Supabase et les observateurs de dimensions/intersection sont simulés. Aucun compte réel n’est créé et le rendu visuel des graphiques n’est pas qualifié.
+
+Commandes de recette : `npm test`, `npm run lint`, `npm run build -- --manifest`, puis `git diff --check`. Une première tentative s’est arrêtée avant le démarrage des tests faute d’espace disque ; elle est conservée comme incident d’environnement et ne compte pas comme une exécution de la suite. La recette a ensuite été rejouée.
+
+Les fichiers publiés sont appliqués sur l’arbre distant existant avec un contrôle de tête attendue. La CI doit être relue sur le nouveau commit ; aucun déploiement de production, navigateur natif, fournisseur réel ou remplacement des données de démonstration n’est inclus dans cette validation.

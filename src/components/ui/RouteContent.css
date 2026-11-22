@@ -1,0 +1,4 @@
+.route-recovery :is(button, a):focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 4px;
+}

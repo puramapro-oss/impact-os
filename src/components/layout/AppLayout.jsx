@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import RouteContent from '../ui/RouteContent';
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -19,7 +20,7 @@ export default function AppLayout() {
       }}>
         <Header onMenuToggle={() => setCollapsed(!collapsed)} />
         <main style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
-          <Outlet />
+          <RouteContent><Outlet /></RouteContent>
         </main>
       </div>
     </div>
