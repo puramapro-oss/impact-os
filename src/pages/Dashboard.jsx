@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { useAnimatedCounter } from '../hooks/useAnimatedCounter';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import {
   Zap, Clock, Euro, TrendingUp, FileText, Mail,
   ArrowUpRight, ArrowDownRight, Play, CheckCircle, ChevronRight
@@ -15,26 +17,7 @@ const iconMap = { Zap, Clock, Euro, TrendingUp, FileText, Mail };
 const colorMap = { blue: '#3b82f6', green: '#10b981', gold: '#f59e0b', purple: '#8b5cf6' };
 
 function KPICard({ kpi, index }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        const start = performance.now();
-        const animate = (now) => {
-          const progress = Math.min((now - start) / 1200, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setCount(Math.round(eased * kpi.value));
-          if (progress < 1) requestAnimationFrame(animate);
-        };
-        requestAnimationFrame(animate);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [kpi.value]);
+  const { count, ref } = useAnimatedCounter(kpi.value, 1200);
 
   const Icon = iconMap[kpi.icon];
 
@@ -88,6 +71,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Dashboard() {
+  const reducedMotion = useReducedMotion();
   const { addToast } = useToast();
   const [actions, setActions] = useState(planDuJour);
 
@@ -131,9 +115,9 @@ export default function Dashboard() {
               <YAxis stroke="var(--text-secondary)" fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
               <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="taches" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Tâches" />
-              <Line type="monotone" dataKey="emails" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} name="Emails" />
-              <Line type="monotone" dataKey="docs" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Documents" />
+              <Line isAnimationActive={!reducedMotion} type="monotone" dataKey="taches" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Tâches" />
+              <Line isAnimationActive={!reducedMotion} type="monotone" dataKey="emails" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} name="Emails" />
+              <Line isAnimationActive={!reducedMotion} type="monotone" dataKey="docs" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} name="Documents" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -147,8 +131,8 @@ export default function Dashboard() {
               <YAxis stroke="var(--text-secondary)" fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
               <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="financements" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Financements (€)" />
-              <Bar dataKey="depenses" fill="#2563eb" radius={[4, 4, 0, 0]} name="Dépenses (€)" />
+              <Bar isAnimationActive={!reducedMotion} dataKey="financements" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Financements (€)" />
+              <Bar isAnimationActive={!reducedMotion} dataKey="depenses" fill="#2563eb" radius={[4, 4, 0, 0]} name="Dépenses (€)" />
             </BarChart>
           </ResponsiveContainer>
         </div>

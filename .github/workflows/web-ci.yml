@@ -38,3 +38,13 @@ jobs:
         run: npm run lint
       - name: Build the complete Vite application with synthetic provider configuration
         run: npm run build
+      - name: Verify the public landing in real Chrome across widths and motion preferences
+        run: node scripts/verify-motion-browser.mjs
+      - name: Retain browser receipts and review captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: impact-browser-motion-${{ github.run_id }}
+          path: qa/browser-motion/
+          if-no-files-found: warn
+          retention-days: 7

@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bot, FileCheck, BarChart3, Shield, Sparkles, Network,
   Dribbble, Palette, Heart, Leaf, Wrench, Briefcase, ShoppingBag, GraduationCap,
-  Check, ChevronDown, ChevronUp, ArrowRight, Zap, Star, Users, Clock
+  Check, ChevronDown, ChevronUp, ArrowRight, Zap, Star, Users, Clock, Menu, X
 } from 'lucide-react';
 import { useAnimatedCounter } from '../hooks/useAnimatedCounter';
 
 function AnimatedStat({ value, suffix, label }) {
   const { count, ref } = useAnimatedCounter(value);
   return (
-    <div ref={ref} style={{ textAlign: 'center' }}>
+    <div ref={ref} className="landing-stat" style={{ textAlign: 'center' }}>
       <div style={{
         fontSize: 48, fontWeight: 800, fontFamily: 'var(--font-heading)',
         background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #fff)',
@@ -63,6 +63,8 @@ export default function Landing() {
   const navigate = useNavigate();
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef(null);
 
   const pricing = [
     {
@@ -116,14 +118,18 @@ export default function Landing() {
   ];
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
+    <div className="landing-page" style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
       {/* Navbar */}
-      <nav style={{
+      <nav aria-label="Navigation principale" className="landing-navigation" onKeyDown={event => {
+        if (event.key === 'Escape' && menuOpen) {
+          event.preventDefault(); setMenuOpen(false); menuButton.current?.focus();
+        }
+      }} style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         background: 'rgba(5, 5, 8, 0.85)', backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-color)',
       }}>
-        <div style={{
+        <div className="landing-navigation-inner" style={{
           maxWidth: 1200, margin: '0 auto', padding: '0 24px',
           height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -144,10 +150,15 @@ export default function Landing() {
               LUMIOS
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <a href="#features" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Fonctionnalités</a>
-            <a href="#pricing" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Tarifs</a>
-            <a href="#faq" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>FAQ</a>
+          <button ref={menuButton} type="button" className="landing-menu-toggle" aria-expanded={menuOpen}
+            aria-controls="landing-navigation-links" aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            onClick={() => setMenuOpen(value => !value)}>
+            {menuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+          </button>
+          <div id="landing-navigation-links" className="landing-navigation-actions" data-open={menuOpen} style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <a onClick={() => setMenuOpen(false)} href="#features" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Fonctionnalités</a>
+            <a onClick={() => setMenuOpen(false)} href="#pricing" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Tarifs</a>
+            <a onClick={() => setMenuOpen(false)} href="#faq" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>FAQ</a>
             <button onClick={() => navigate('/login')} className="btn-ghost">Connexion</button>
             <button onClick={() => navigate('/register')} className="btn-primary">
               Essai gratuit <ArrowRight size={16} />
@@ -156,8 +167,9 @@ export default function Landing() {
         </div>
       </nav>
 
+      <main>
       {/* Hero */}
-      <section style={{
+      <section className="landing-hero" style={{
         minHeight: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         textAlign: 'center', padding: '120px 24px 80px',
@@ -185,7 +197,7 @@ export default function Landing() {
           Propulsé par l'intelligence artificielle Claude
         </div>
         <h1 style={{
-          fontFamily: 'var(--font-heading)', fontSize: 56, fontWeight: 900,
+          fontFamily: 'var(--font-heading)', fontSize: 'clamp(34px, 5vw, 56px)', fontWeight: 900,
           lineHeight: 1.1, maxWidth: 800, marginBottom: 24,
         }}>
           LUMIOS illumine{' '}
@@ -201,7 +213,7 @@ export default function Landing() {
           L'IA qui libère les associations de l'administratif pour qu'elles brillent.
           Automatisez 70% de vos tâches. Conçu pour les associations françaises.
         </p>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 64 }}>
+        <div className="landing-hero-actions" style={{ display: 'flex', gap: 16, marginBottom: 64 }}>
           <button onClick={() => navigate('/register')} className="btn-primary" style={{ padding: '14px 32px', fontSize: 16 }}>
             Démarrer gratuitement <ArrowRight size={18} />
           </button>
@@ -209,8 +221,8 @@ export default function Landing() {
             Voir la démo
           </button>
         </div>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48,
+        <div className="landing-stats" style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 48,
           maxWidth: 700,
         }}>
           <AnimatedStat value={2400} suffix="+" label="Organisations actives" />
@@ -227,11 +239,11 @@ export default function Landing() {
             Six modules puissants qui travaillent ensemble pour automatiser votre quotidien
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+        <div className="landing-grid-three" style={{ display: 'grid', gap: 24 }}>
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
-              <div key={i} className="glass-card" style={{
+              <div key={i} className="glass-card landing-hover-card" style={{
                 padding: 28, transition: 'transform 0.2s ease, border-color 0.2s ease',
                 cursor: 'default',
               }}
@@ -261,12 +273,12 @@ export default function Landing() {
             Des configurations prêtes à l'emploi adaptées à votre secteur d'activité
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div className="landing-grid-four" style={{ display: 'grid', gap: 16 }}>
           {packs.map((p, i) => {
             const Icon = p.icon;
             return (
-              <div key={i} className="glass-card" style={{
-                padding: 20, textAlign: 'center', cursor: 'pointer',
+              <button type="button" key={i} className="glass-card landing-hover-card" style={{
+                padding: 20, color: 'var(--text-primary)', textAlign: 'center', cursor: 'pointer',
                 transition: 'transform 0.2s ease',
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -274,9 +286,9 @@ export default function Landing() {
               onClick={() => navigate('/register')}
               >
                 <Icon size={28} color="#f59e0b" style={{ marginBottom: 12 }} />
-                <h4 style={{ fontSize: 15, marginBottom: 6 }}>{p.title}</h4>
-                <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{p.desc}</p>
-              </div>
+                <span style={{ display: 'block', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{p.title}</span>
+                <span style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)' }}>{p.desc}</span>
+              </button>
             );
           })}
         </div>
@@ -287,7 +299,7 @@ export default function Landing() {
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <h2 style={{ fontSize: 36, marginBottom: 16 }}>Ils nous font confiance</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+        <div className="landing-grid-three" style={{ display: 'grid', gap: 24 }}>
           {temoignages.map((t, i) => (
             <div key={i} className="glass-card" style={{ padding: 28 }}>
               <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
@@ -313,7 +325,7 @@ export default function Landing() {
           <h2 style={{ fontSize: 36, marginBottom: 16 }}>Tarifs simples et transparents</h2>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <span style={{ fontSize: 14, color: annual ? 'var(--text-secondary)' : 'var(--text-primary)', fontWeight: annual ? 400 : 600 }}>Mensuel</span>
-            <button
+            <button type="button" role="switch" aria-label="Facturation annuelle" aria-checked={annual}
               onClick={() => setAnnual(!annual)}
               style={{
                 width: 48, height: 26, borderRadius: 13, padding: 3,
@@ -332,7 +344,7 @@ export default function Landing() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, alignItems: 'start' }}>
+        <div className="landing-grid-four landing-pricing" style={{ display: 'grid', gap: 20, alignItems: 'start' }}>
           {pricing.map((plan, i) => (
             <div key={i} className="glass-card" style={{
               padding: 28, position: 'relative',
@@ -404,7 +416,7 @@ export default function Landing() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {faqItems.map((item, i) => (
             <div key={i} className="glass-card" style={{ overflow: 'hidden' }}>
-              <button
+              <button type="button" aria-expanded={openFaq === i} aria-controls={`landing-faq-answer-${i}`}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 style={{
                   width: '100%', padding: '16px 20px',
@@ -417,7 +429,7 @@ export default function Landing() {
                 {openFaq === i ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </button>
               {openFaq === i && (
-                <div style={{
+                <div id={`landing-faq-answer-${i}`} style={{
                   padding: '0 20px 16px',
                   fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7,
                   animation: 'fadeIn 0.2s ease',
@@ -444,13 +456,14 @@ export default function Landing() {
         </button>
       </section>
 
+      </main>
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid var(--border-color)',
         padding: '48px 24px 24px',
         maxWidth: 1200, margin: '0 auto',
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 40 }}>
+        <div className="landing-grid-four" style={{ display: 'grid', gap: 32, marginBottom: 40 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <div style={{
@@ -475,7 +488,7 @@ export default function Landing() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <a href="#features" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Fonctionnalités</a>
               <a href="#pricing" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Tarifs</a>
-              <span onClick={() => navigate('/dashboard')} style={{ fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer' }}>Démo</span>
+              <button type="button" onClick={() => navigate('/dashboard')} style={{ fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', textAlign: 'left' }}>Démo</button>
               <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Intégrations</span>
             </div>
           </div>
@@ -500,7 +513,7 @@ export default function Landing() {
         </div>
         <div style={{
           borderTop: '1px solid var(--border-color)', paddingTop: 24,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>© 2026 LUMIOS. Tous droits réservés.</span>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>LUMIOS — La lumière qui guide votre organisation. 🇫🇷</span>
