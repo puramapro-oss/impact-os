@@ -9,18 +9,36 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    let active = true;
+    let receivedAuthEvent = false;
+
+    const applySession = nextSession => {
+      if (!active) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
       setLoading(false);
+    };
+
+    // Subscribe first so a sign-out cannot be overwritten by an older snapshot.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      receivedAuthEvent = true;
+      applySession(nextSession);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    const readInitialSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (!receivedAuthEvent) applySession(error ? null : (data?.session ?? null));
+      } catch {
+        if (!receivedAuthEvent) applySession(null);
+      }
+    };
+    void readInitialSession();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email, password, metadata) => {
