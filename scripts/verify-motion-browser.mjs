@@ -318,6 +318,58 @@ async function scenario(cdp, base, width, reduced, theme = 'dark') {
     check(result, 'counter-text-fits-without-clipping-or-overlap',
       statText.counters.length === expectedStats.length && statText.counters.every((counter,index) => counter.fullyContained && counter.label === expectedStats[index].label && counter.value === expectedStats[index].value) && statText.overlaps.length === 0, statText);
 
+    if (theme === 'light') {
+      const textPaint = await evaluate(cdp, session, `(() => {
+        const expectedCounts = {'.landing-wordmark':2,'.landing-highlight':1,'.landing-stat-value':3};
+        const minimumContrast = 4.5;
+        const parseColor = value => {
+          const match = value.match(/^rgba?\\((.+)\\)$/);
+          if (!match) return null;
+          const parts = match[1].split(/[,\\s/]+/).filter(Boolean).map(Number);
+          if (parts.length<3 || parts.length>4 || !parts.every(Number.isFinite)) return null;
+          return {rgb:parts.slice(0,3),alpha:parts[3]??1};
+        };
+        const luminance = color => color.rgb.map(channel => {
+          const value = channel/255;
+          return value<=0.04045 ? value/12.92 : ((value+0.055)/1.055)**2.4;
+        }).reduce((sum,channel,index) => sum+channel*[0.2126,0.7152,0.0722][index],0);
+        const counts = {}, elements = [];
+        for (const [selector,expectedCount] of Object.entries(expectedCounts)) {
+          const matches = [...document.querySelectorAll(selector)];
+          counts[selector] = {expected:expectedCount,actual:matches.length};
+          for (const el of matches) {
+            const style = getComputedStyle(el), box = el.getBoundingClientRect();
+            const fill = style.webkitTextFillColor, foreground = parseColor(fill);
+            let effectiveOpacity = 1, visibleAncestors = true, background = null, backgroundSource = null, unresolvedBackground = false;
+            for (let node=el;node;node=node.parentElement) {
+              const ancestor = getComputedStyle(node);
+              effectiveOpacity *= Number(ancestor.opacity);
+              if (ancestor.display==='none' || ['hidden','collapse'].includes(ancestor.visibility) || ancestor.contentVisibility==='hidden') visibleAncestors = false;
+              if (!background) {
+                const color = parseColor(ancestor.backgroundColor);
+                if (ancestor.backgroundImage!=='none' || !color || (color.alpha>0 && color.alpha<1)) unresolvedBackground = true;
+                if (color?.alpha===1) { background=color; backgroundSource={tag:node.tagName,className:node.className,color:ancestor.backgroundColor}; }
+              }
+            }
+            const hasText = el.textContent.trim().length>0;
+            const opaqueFill = foreground?.alpha===1 && effectiveOpacity>=0.999;
+            const visibleGeometry = box.width>0 && box.height>0 && el.getClientRects().length>0 && visibleAncestors;
+            const contrast = opaqueFill && background && !unresolvedBackground
+              ? (Math.max(luminance(foreground),luminance(background))+0.05)/(Math.min(luminance(foreground),luminance(background))+0.05) : null;
+            elements.push({selector,text:el.textContent.trim(),fill,color:style.color,backgroundImage:style.backgroundImage,
+              fontSize:style.fontSize,fontWeight:style.fontWeight,effectiveOpacity,opaqueFill,visibleGeometry,
+              backgroundSource,unresolvedBackground,contrast,
+              paintedAndReadable:hasText && opaqueFill && visibleGeometry && contrast!==null && contrast>=minimumContrast});
+          }
+        }
+        return {counts,minimumContrast,elements,
+          contrastScope:'Computed solid text fill against its nearest opaque ancestor background; decorative sibling overlays are not sampled'};
+      })()`);
+      result.textPaint = textPaint;
+      check(result, 'light-solid-text-painted-and-readable',
+        Object.values(textPaint.counts).every(count => count.actual === count.expected) && textPaint.elements.length === 6 && textPaint.elements.every(element => element.paintedAndReadable), textPaint);
+    } else result.textPaint = {status:'NOT_APPLICABLE',reason:'This gate verifies the light-theme solid text; the dark-theme gradients remain intentional'};
+
     const layout = await evaluate(cdp, session, `(() => {
       const width = document.documentElement.clientWidth;
       const overflow = [...document.querySelectorAll('body *')].flatMap(el => {
