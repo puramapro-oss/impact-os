@@ -11,6 +11,7 @@ Ce lot complète la PR2 IMPACT-OS existante sur le parent `b642789592e48942d9d88
 - Un refus de lecture/écriture du stockage ne fait plus tomber le thème. Le choix reste actif en mémoire ; une valeur inconnue revient au thème sombre existant.
 - La navigation et les grilles de l'accueil s'adaptent aux petits écrans. Le menu possède un bouton nommé et un état annoncé, et Échap rend le focus à ce bouton. Les packs et le lien de démonstration utilisent des boutons natifs ; facturation annuelle et FAQ annoncent leur état.
 - Un focus clavier visible est conservé dans les deux thèmes, avec un contour interne dans la FAQ pour éviter le découpage par son conteneur. Le menu clair utilise un fond clair. Les couleurs et données métier ne constituent pas une qualification réglementaire ou commerciale.
+- Les captures réelles ont fait corriger le texte des statistiques découpé, le remplissage transparent de certains textes clairs, les petits libellés trop pâles et le contraste du sélecteur de facturation. Les accents de texte utilisent un ambre plus foncé en thème clair ; les fonds des boutons principaux restent ceux de la charte. La recette distingue la géométrie du texte, sa peinture et le contraste des commandes.
 
 ## Vérifications
 

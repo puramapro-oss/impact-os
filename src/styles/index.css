@@ -290,7 +290,8 @@ img {
 }
 
 /* Retain the existing landing design while allowing cards and controls to fit. */
-.landing-page { --text-muted: var(--text-secondary); }
+.landing-page { --text-muted: var(--text-secondary); --landing-accent-ink: #f59e0b; }
+[data-theme="light"] .landing-page { --landing-accent-ink: #92400e; }
 .landing-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .landing-grid-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .landing-page main, .landing-page section, .landing-page .glass-card { min-width: 0; }

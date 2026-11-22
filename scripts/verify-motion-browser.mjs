@@ -193,6 +193,118 @@ async function waitForFocusedControl(cdp, session) {
   })`);
 }
 
+// Serialized into the real page: observe completion without changing CSS or time.
+function waitForBillingSettled(expectedChecked) {
+  return new Promise((resolveResult, reject) => {
+    const control = document.querySelector('.landing-billing-switch');
+    const knob = document.querySelector('.landing-billing-knob');
+    if (!control || !knob) { reject(new Error('The annual billing control and knob must exist')); return; }
+    const started = performance.now(), deadlineMs = 2000, requiredStableMs = 100;
+    let previous = null, stableSince = null, current = null, samples = 0, frame, finished = false;
+    const read = () => {
+      const trackBox = control.getBoundingClientRect(), knobBox = knob.getBoundingClientRect();
+      return {
+        checked: control.getAttribute('aria-checked'),
+        trackColor: getComputedStyle(control).backgroundColor,
+        knobColor: getComputedStyle(knob).backgroundColor,
+        geometry: [trackBox.x, trackBox.y, trackBox.width, trackBox.height, knobBox.x, knobBox.y, knobBox.width, knobBox.height],
+        activeAnimations: control.getAnimations({ subtree: true }).filter(animation => animation.playState === 'running' || animation.pending).length,
+      };
+    };
+    const finish = timedOut => {
+      if (finished) return;
+      finished = true; clearTimeout(timer); cancelAnimationFrame(frame);
+      resolveResult({ ...current, timedOut, settled: !timedOut, samples,
+        elapsedMs: Math.round(performance.now() - started), deadlineMs, requiredStableMs });
+    };
+    const sample = () => {
+      current = read(); samples++;
+      const now = performance.now();
+      const unchanged = previous && current.trackColor === previous.trackColor && current.knobColor === previous.knobColor
+        && current.geometry.every((coordinate, index) => Math.abs(coordinate - previous.geometry[index]) <= 0.25);
+      const ready = current.checked === String(expectedChecked) && current.activeAnimations === 0;
+      stableSince = ready && unchanged ? (stableSince ?? now) : null;
+      if (stableSince !== null && now - stableSince >= requiredStableMs) { finish(false); return; }
+      previous = current; frame = requestAnimationFrame(sample);
+    };
+    const timer = setTimeout(() => { current = read(); finish(true); }, deadlineMs);
+    frame = requestAnimationFrame(sample);
+  });
+}
+
+// Actual computed colors are alpha-composited through the ancestor backgrounds.
+// No palette token, stylesheet declaration or expected hex color is asserted.
+function collectBillingState() {
+  const parseColor = value => {
+    const match = value.match(/^rgba?\((.+)\)$/);
+    if (!match) return null;
+    const parts = match[1].split(/[,\s/]+/).filter(Boolean).map(Number);
+    if (parts.length < 3 || parts.length > 4 || !parts.every(Number.isFinite)) return null;
+    return { rgb: parts.slice(0, 3), alpha: parts[3] ?? 1 };
+  };
+  const composite = (foreground, background) => foreground.rgb.map((channel, index) => foreground.alpha * channel + (1 - foreground.alpha) * background[index]);
+  const backgroundFor = element => {
+    const layers = [];
+    let opaqueBase = null, supported = true;
+    for (let node = element; node; node = node.parentElement) {
+      const style = getComputedStyle(node), color = parseColor(style.backgroundColor);
+      layers.push({ tag: node.tagName, className: node.className, color: style.backgroundColor, image: style.backgroundImage });
+      if (!color || style.backgroundImage !== 'none') supported = false;
+      if (color?.alpha === 1) { opaqueBase = color.rgb; break; }
+    }
+    if (!opaqueBase || !supported) return { rgb: null, supported: false, layers };
+    let rgb = opaqueBase;
+    for (let index = layers.length - 2; index >= 0; index--) rgb = composite(parseColor(layers[index].color), rgb);
+    return { rgb, supported: true, layers };
+  };
+  const luminance = rgb => rgb.map(channel => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  }).reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+  const contrast = (left, right) => left && right
+    ? (Math.max(luminance(left), luminance(right)) + 0.05) / (Math.min(luminance(left), luminance(right)) + 0.05) : null;
+  const appearance = element => {
+    let opacity = 1, visible = true;
+    for (let node = element; node; node = node.parentElement) {
+      const style = getComputedStyle(node);
+      opacity *= Number(style.opacity);
+      if (style.display === 'none' || ['hidden', 'collapse'].includes(style.visibility) || style.contentVisibility === 'hidden') visible = false;
+    }
+    const box = element.getBoundingClientRect();
+    return { opacity, visible: visible && box.width > 0 && box.height > 0 && element.getClientRects().length > 0 };
+  };
+  const bounds = element => {
+    const box = element.getBoundingClientRect();
+    return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+  };
+  const control = document.querySelector('.landing-billing-switch'), knob = document.querySelector('.landing-billing-knob');
+  if (!control || !knob) throw new Error('The actual billing switch and knob must exist');
+  const trackBox = bounds(control), knobBox = bounds(knob);
+  const track = backgroundFor(control), surrounding = backgroundFor(control.parentElement), thumb = backgroundFor(knob);
+  const controlAppearance = appearance(control), knobAppearance = appearance(knob);
+  const text = [...document.querySelectorAll('.landing-accent-text')].map(element => {
+    const style = getComputedStyle(element), fill = parseColor(style.webkitTextFillColor), background = backgroundFor(element), visibility = appearance(element);
+    const content = element.textContent.trim();
+    const usage = element.closest('.landing-hero') ? 'hero'
+      : content === '-25%' ? 'discount'
+        : /€\s*\/\s*an/.test(content) ? 'annual-total' : 'plan-badge';
+    return { usage, text: content, fill: style.webkitTextFillColor, background,
+      opaque: fill?.alpha === 1 && visibility.opacity >= 0.999, visible: visibility.visible,
+      contrast: fill?.alpha === 1 ? contrast(fill.rgb, background.rgb) : null };
+  });
+  const counts = Object.fromEntries(['hero', 'discount', 'annual-total', 'plan-badge'].map(usage => [usage, text.filter(item => item.usage === usage).length]));
+  return {
+    checked: control.getAttribute('aria-checked'), role: control.getAttribute('role'), name: control.getAttribute('aria-label'),
+    trackBox, knobBox, track, surrounding, thumb,
+    trackToSurroundingContrast: contrast(track.rgb, surrounding.rgb), knobToTrackContrast: contrast(thumb.rgb, track.rgb),
+    visibleOpaqueControl: controlAppearance.visible && knobAppearance.visible && controlAppearance.opacity >= 0.999 && knobAppearance.opacity >= 0.999,
+    knobInsideTrack: knobBox.left >= trackBox.left - 0.5 && knobBox.right <= trackBox.right + 0.5 && knobBox.top >= trackBox.top - 0.5 && knobBox.bottom <= trackBox.bottom + 0.5,
+    knobCenterFraction: trackBox.width > 0 ? ((knobBox.left + knobBox.right) / 2 - trackBox.left) / trackBox.width : null,
+    accentText: { counts, elements: text, total: text.length,
+      contrastScope: 'RGBA background colors composed through ancestors; decorative sibling overlays, filters and pixel antialiasing are not sampled' },
+  };
+}
+
 async function screenshot(cdp, session, name) {
   await evaluate(cdp, session, 'window.scrollTo({top:0,left:0,behavior:"instant"})');
   await evaluate(cdp, session, frames);
@@ -454,6 +566,35 @@ async function scenario(cdp, base, width, reduced, theme = 'dark') {
     await click(cdp, session, faqSelector);
     const faqClosed = await evaluate(cdp, session, expanderExpression(faqSelector));
     check(result, 'faq-closes-and-updates-aria', faqClosed?.expanded === 'false' && !faqClosed.panelVisible, faqClosed);
+
+    result.billingStates = [];
+    const billingSelector = '.landing-billing-switch';
+    await evaluate(cdp, session, "document.querySelector('.landing-billing-switch').scrollIntoView({block:'center',behavior:'instant'})");
+    for (const [stage, expectedChecked] of [['monthly-before', false], ['annual', true], ['monthly-restored', false]]) {
+      if (stage !== 'monthly-before') await click(cdp, session, billingSelector);
+      const settlement = await evaluate(cdp, session, `(${waitForBillingSettled.toString()})(${JSON.stringify(expectedChecked)})`);
+      const observation = await evaluate(cdp, session, `(${collectBillingState.toString()})()`);
+      const state = { stage, settlement, ...observation };
+      result.billingStates.push(state);
+      check(result, `billing-${stage}-state-and-control-contrast`,
+        settlement.settled && !settlement.timedOut && state.checked === String(expectedChecked)
+        && state.role === 'switch' && state.name === 'Facturation annuelle'
+        && state.visibleOpaqueControl && state.knobInsideTrack
+        && state.trackToSurroundingContrast !== null && state.trackToSurroundingContrast >= 3
+        && state.knobToTrackContrast !== null && state.knobToTrackContrast >= 3, state);
+      const counts = state.accentText.counts;
+      const correctContent = state.accentText.total === (expectedChecked ? 8 : 5)
+        && counts.hero === 1 && counts.discount === 1 && counts['plan-badge'] === 3 && counts['annual-total'] === (expectedChecked ? 3 : 0)
+        && state.accentText.elements.every(element => element.visible && element.text.length > 0);
+      check(result, `billing-${stage}-rendered-content`, correctContent, state.accentText);
+      if (theme === 'light') check(result, `billing-${stage}-accent-text-contrast`,
+        correctContent && state.accentText.elements.every(element => element.opaque && element.visible && element.contrast !== null && element.contrast >= 4.5), state.accentText);
+    }
+    const [monthlyBefore, annual, monthlyRestored] = result.billingStates;
+    check(result, 'billing-switch-knob-moves-and-returns',
+      annual.knobCenterFraction - monthlyBefore.knobCenterFraction > 0.2
+      && Math.abs(monthlyRestored.knobCenterFraction - monthlyBefore.knobCenterFraction) <= 0.02,
+      result.billingStates.map(state => ({ stage: state.stage, checked: state.checked, knobCenterFraction: state.knobCenterFraction })));
 
     result.images = await evaluate(cdp, session, "[...document.images].map(image => ({source:image.currentSrc || image.src,complete:image.complete,width:image.naturalWidth,height:image.naturalHeight}))");
     if (result.images.length) check(result, 'rendered-images-loaded', result.images.every(image => image.complete && image.width > 0 && image.height > 0), result.images);

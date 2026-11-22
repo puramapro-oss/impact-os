@@ -187,11 +187,11 @@ export default function Landing() {
           background: 'radial-gradient(circle, rgba(251, 191, 36, 0.05) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
-        <div style={{
+        <div className="landing-accent-text" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '6px 16px', borderRadius: 20,
           background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)',
-          fontSize: 13, color: '#f59e0b', fontWeight: 600, marginBottom: 24,
+          fontSize: 13, color: 'var(--landing-accent-ink)', fontWeight: 600, marginBottom: 24,
         }}>
           <Sparkles size={14} />
           Propulsé par l'intelligence artificielle Claude
@@ -325,22 +325,22 @@ export default function Landing() {
           <h2 style={{ fontSize: 36, marginBottom: 16 }}>Tarifs simples et transparents</h2>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <span style={{ fontSize: 14, color: annual ? 'var(--text-secondary)' : 'var(--text-primary)', fontWeight: annual ? 400 : 600 }}>Mensuel</span>
-            <button type="button" role="switch" aria-label="Facturation annuelle" aria-checked={annual}
+            <button type="button" className="landing-billing-switch" role="switch" aria-label="Facturation annuelle" aria-checked={annual}
               onClick={() => setAnnual(!annual)}
               style={{
                 width: 48, height: 26, borderRadius: 13, padding: 3,
-                background: annual ? '#f59e0b' : 'var(--border-color)',
+                background: annual ? 'var(--landing-accent-ink)' : 'var(--text-secondary)',
                 transition: 'background 0.2s ease', position: 'relative',
               }}
             >
-              <div style={{
-                width: 20, height: 20, borderRadius: '50%', background: 'white',
+              <span className="landing-billing-knob" aria-hidden="true" style={{
+                display: 'block', width: 20, height: 20, borderRadius: '50%', background: 'var(--bg-primary)',
                 transition: 'transform 0.2s ease',
                 transform: annual ? 'translateX(22px)' : 'translateX(0)',
               }} />
             </button>
             <span style={{ fontSize: 14, color: annual ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: annual ? 600 : 400 }}>
-              Annuel <span style={{ color: '#f59e0b', fontSize: 12 }}>-25%</span>
+              Annuel <span className="landing-accent-text" style={{ color: 'var(--landing-accent-ink)', fontSize: 12 }}>-25%</span>
             </span>
           </div>
         </div>
@@ -371,7 +371,7 @@ export default function Landing() {
                 <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>/mois</span>
               </div>
               {annual && plan.prix > 0 && (
-                <div style={{ fontSize: 11, color: '#f59e0b', marginBottom: 12 }}>
+                <div className="landing-accent-text" style={{ fontSize: 11, color: 'var(--landing-accent-ink)', marginBottom: 12 }}>
                   soit {plan.prix * 12 * 0.75}€/an — 25% économisé
                 </div>
               )}
@@ -388,8 +388,8 @@ export default function Landing() {
                 {plan.cta}
               </button>
               {plan.badge && (
-                <div style={{
-                  fontSize: 11, color: '#f59e0b', fontWeight: 600, marginBottom: 12,
+                <div className="landing-accent-text" style={{
+                  fontSize: 11, color: 'var(--landing-accent-ink)', fontWeight: 600, marginBottom: 12,
                   padding: '6px 10px', borderRadius: 6,
                   background: 'rgba(245, 158, 11, 0.08)',
                   textAlign: 'center',
